@@ -1,0 +1,109 @@
+---
+title: "Overview of Project Deforestation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+#library(ProjectDeforestation)
+```
+
+Title: Deforestation and carbon balance in Southern Virginia, U.S. between 1990 and 2000
+
+Summary:A brief (up to 250 words) description of the project, and a bullet point or enumerated list of its primary objectives.
+
+This study intends to understand the connection among deforestation, carbon, and biomass in Virginia. We are interested in how deforestation between 1990 and 2000 affects carbon stock and biomass in Virginia.  
+
+...
+
+
+Approach and Method: An outline of the analytical methods and code you plan to use, including the names of key packages that you will draw on. This section should be composed of the following sub-sections:
+
+1. Quantifying forest harvest between 1990 and 2000
+
+
+2. Comparing forest carbon stock change between 1990 and 2000
+
+3. Comparing forest biomass change between 1990 and 2000
+```{r}
+library(geospaar)
+library(rgdal)
+library(dplyr)
+library(raster)
+# read study area's shapefile
+# use relevant paths in the package, not full paths
+studyarea <- file.path("C:/Users/Li/Desktop/geog_346/Virginia_City_County_Census_Boundaries-shp/VA_STUDYAREA.shp")
+studyarea <- st_read(studyarea)
+studyarea
+
+# import raster (FIA ALD biomass)
+path1 <- "C:/Users/Li/Desktop/geog_346/NBCD_MZ60_FIA_ALD_biomass/NBCD_MZ60_FIA_ALD_biomass.tif"
+biomass1 <- raster(path1)
+biomass1
+plot(biomass1)
+
+path2 <- "C:/Users/Li/Desktop/geog_346/NBCD_MZ59_FIA_ALD_biomass/NBCD_MZ59_FIA_ALD_biomass.tif"
+biomass2 <- raster(path2)
+biomass2
+plot(biomass2, add = TRUE)
+
+# Reproject
+studyarea_nad83 <- st_transform(x = studyarea, crs = crs(biomass1))
+studyarea_nad83
+par(mar = rep(0,4))
+plot(studyarea_nad83[6], add = TRUE)
+
+# Merge rasters
+biomass_merge <- merge(biomass1, biomass2)
+biomass_merge
+plot(biomass_merge)
+
+biomass_crop <- crop(x = biomass_merge, y = studyarea_nad83)
+biomass_crop
+plot(biomass_crop)
+plot(st_geometry(studyarea_nad83), col = rgb(1, 1, 1, alpha = 0), add = TRUE)
+
+biomass_clip <- raster::mask(x = biomass_crop, mask = studyarea_nad83)
+plot(biomass_clip)
+
+```
+
+
+
+
+4. Examine the connections among forest harvest, forest carbon stock change, and biomass change between 1990 and 2000 
+
+5. Web-mapping (visulization) 
+shiny 
+leaflet 
+
+
+Data: A brief (~250 words) description and visualization of the datasets you will be using. That means spatial plots of the main datasets and their key values, and, as a bonus, a plot of summary statistics, e.g. a histogram or boxplot of one of the more importants variables in the dataset.
+
+NAFD: North American forest dynamics
+MTBS: the Monitoring Trends in Burn Severity
+Forest Carbon Stocks and Fluxes After Disturbance, Southeastern USA, 1990-2010
+NBCD: NACP Aboveground Biomass and Carbon Baseline Data, V[ersion]. 2
+
+Code: A bullet point summary of the analysis and coding approach that you propose to follow. For teams, this section should include a description of which member will be responsible for each bullet point.
+
+(Remember to save output to PNG file, so it saves time of processing)
+
+Timelines: Provide a timeline for when each portion of the analysis will be completed. These timelines should be constructed relative to the time period of presentations (during the last two weeks of class) and final project submission (during exam week). For teams, names should be associated with each step on the timeline.
+
+
+
+
+Anticipated outcomes: Briefly describe, as bullet points, the outcomes you expect for each of your primary project objectives
+
+
