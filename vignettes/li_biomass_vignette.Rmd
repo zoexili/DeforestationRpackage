@@ -1,8 +1,8 @@
 ---
-title: "Overview of Project Deforestation"
+title: "Li biomass vignette"
 output: rmarkdown::html_vignette
 vignette: >
-  %\VignetteIndexEntry{Overview}
+  %\VignetteIndexEntry{Li biomass vignette}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
 ---
@@ -40,9 +40,11 @@ library(geospaar)
 library(rgdal)
 library(dplyr)
 library(raster)
+library(deforestation)
 # read study area's shapefile
 # use relevant paths in the package, not full paths
 studyarea <- file.path("C:/Users/Li/Desktop/geog_346/Virginia_City_County_Census_Boundaries-shp/VA_STUDYAREA.shp")
+studyarea <- system.file("data/VA_STUDYAREA.shp", package = "deforestation")
 studyarea <- st_read(studyarea)
 studyarea
 
