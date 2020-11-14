@@ -43,7 +43,6 @@ library(raster)
 library(deforestation)
 # read study area's shapefile
 # use relevant paths in the package, not full paths
-studyarea <- file.path("C:/Users/Li/Desktop/geog_346/Virginia_City_County_Census_Boundaries-shp/VA_STUDYAREA.shp")
 studyarea <- system.file("data/VA_STUDYAREA.shp", package = "deforestation")
 studyarea <- st_read(studyarea)
 studyarea
