@@ -43,7 +43,7 @@ library(rgdal)
 library(dplyr)
 
 # install my own package deforestation, run these two lines every time after changing anything in your package. 
-devtools:document()
+devtools::document()
 devtools::install()
 
 library(deforestation)
