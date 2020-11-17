@@ -43,8 +43,8 @@ library(rgdal)
 library(dplyr)
 
 # install my own package deforestation, run these two lines every time after changing anything in your package. 
-devtools::document()
-devtools::install()
+# devtools::document()
+# devtools::install()
 
 library(deforestation)
 # read study area's shapefile
@@ -87,8 +87,11 @@ biomass_clip <- raster::mask(x = biomass_crop, mask = studyarea_nad83)
 plot(biomass_clip)
 
 ## write raster into a new tif and save it in extdata/ 
-writeRaster(biomass_clip, filename = file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif"))
-biomass_FIA_ALD2000 <- raster(file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif"))
+writeRaster(biomass_clip, 
+            filename = file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif"))
+biomass_FIA_ALD2000 <- raster(
+  file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif")
+)
 plot(biomass_FIA_ALD2000)
 
 # Dataset: Forest Carbon Stocks and Fluxes After Disturbance, SE US
