@@ -35,19 +35,26 @@ Approach and Method: An outline of the analytical methods and code you plan to u
 2. Comparing forest carbon stock change between 1990 and 2000
 
 3. Comparing forest biomass change between 1990 and 2000
+
+3.1 Data pre-processing
 ```{r}
 library(geospaar)
 library(rgdal)
 library(dplyr)
-library(raster)
+
+# install my own package deforestation, run these two lines every time after changing anything in your package. 
+devtools:document()
+devtools::install()
+
 library(deforestation)
 # read study area's shapefile
 # use relevant paths in the package, not full paths
-studyarea <- system.file("data/VA_STUDYAREA.shp", package = "deforestation")
+studyarea <- system.file("extdata/VA_STUDYAREA.shp", package = "deforestation")
 studyarea <- st_read(studyarea)
 studyarea
 
-# import raster (FIA ALD biomass)
+# Dataset: NBCD V2 2000
+## import raster (FIA ALD biomass)
 path1 <- "C:/Users/Li/Desktop/geog_346/NBCD_MZ60_FIA_ALD_biomass/NBCD_MZ60_FIA_ALD_biomass.tif"
 biomass1 <- raster(path1)
 biomass1
@@ -58,27 +65,115 @@ biomass2 <- raster(path2)
 biomass2
 plot(biomass2, add = TRUE)
 
-# Reproject
+## Reproject study area shapefile
 studyarea_nad83 <- st_transform(x = studyarea, crs = crs(biomass1))
 studyarea_nad83
 par(mar = rep(0,4))
 plot(studyarea_nad83[6], add = TRUE)
 
-# Merge rasters
+## Merge rasters
 biomass_merge <- merge(biomass1, biomass2)
 biomass_merge
 plot(biomass_merge)
 
+## crop raster
 biomass_crop <- crop(x = biomass_merge, y = studyarea_nad83)
 biomass_crop
 plot(biomass_crop)
 plot(st_geometry(studyarea_nad83), col = rgb(1, 1, 1, alpha = 0), add = TRUE)
 
+## mask raster
 biomass_clip <- raster::mask(x = biomass_crop, mask = studyarea_nad83)
 plot(biomass_clip)
 
+## write raster into a new tif and save it in extdata/ 
+writeRaster(biomass_clip, filename = file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif"))
+biomass_FIA_ALD2000 <- raster(file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif"))
+plot(biomass_FIA_ALD2000)
+
+# Dataset: Forest Carbon Stocks and Fluxes After Disturbance, SE US
+## import raster
+path3 <- "C:/Users/Li/Desktop/geog_346/agb_1990.tif"
+biomass3 <- raster(path3)
+biomass3
+plot(biomass3)
+
+path4 <- "C:/Users/Li/Desktop/geog_346/agb_2000.tif"
+biomass4 <- raster(path4)
+biomass4
+plot(biomass4)
+
+## crop raster 
+biomass3_crop <- crop(x = biomass3, y = studyarea_nad83)
+biomass3_crop
+plot(biomass3_crop)
+plot(st_geometry(studyarea_nad83), col = rgb(1, 1, 1, alpha = 0), add = TRUE)
+
+biomass4_crop <- crop(x = biomass4, y = studyarea_nad83)
+biomass4_crop
+plot(biomass4_crop)
+
+## mask raster
+biomass3_clip <- raster::mask(x = biomass3_crop, mask = studyarea_nad83)
+plot(biomass3_clip)
+
+biomass4_clip <- raster::mask(x = biomass4_crop, mask = studyarea_nad83)
+plot(biomass4_clip)
+
+# write rasters into extdata/
+writeRaster(biomass3_clip, filename = file.path("inst/extdata/", "agb1990.tif"))
+agb1990 <- raster(file.path("inst/extdata/", "agb1990.tif"))
+plot(agb1990)
+
+writeRaster(biomass4_clip, filename = file.path("inst/extdata/", "agb2000.tif"))
+agb2000 <- raster(file.path("inst/extdata/", "agb2000.tif"))
+plot(agb2000)
+
 ```
 
+3.2 Table & bar graph: List total quantities of AGB (kg C m-2 y-1) of harvested forest area in 1990 and 2000, over six counties. 
+```{r}
+# 1990
+## create empty raster in study area's extent and fill in value
+zonal_ras <- raster(x = extent(studyarea_nad83), crs = crs(studyarea_nad83), res = 30)
+values(zonal_ras) <- 1:ncell(zonal_ras)
+
+## convert vector to raster
+studyarea_nad83_ras <- studyarea_nad83 %>% rasterize(x = ., y = zonal_ras) 
+plot(studyarea_nad83_ras)
+
+## zonal statistics
+### resample studyarea_nad83_ras to the parameters of agb1990, so the extent matches between data. 
+studyarea_nad83_ras_rs <- resample(x = studyarea_nad83_ras, y = agb1990, method = "ngb")
+plot(studyarea_nad83_ras_rs)
+zonal_agb1990 <- zonal(x = agb1990, z = studyarea_nad83_ras_rs, fun = "sum") 
+plot(zonal_agb1990)
+
+## convert list to matrix and change row/col names
+zonal_agb1990_m <- as.matrix(zonal_agb1990)
+colnames(zonal_agb1990_m) <- c("Zone", "AGB of total forest land (Kg C m-2)")
+rownames(zonal_agb1990_m) <- studyarea_nad83$NAME
+
+
+## table
+zonal_agb1990_m
+
+## bar graph
+barplot(zonal_agb1990_m[,2], main="AGB of total forest land 1990", ylab = colnames(zonal_agb1990_m)[2])
+
+# 2000
+studyarea_nad83_ras_rs2000 <- resample(x = studyarea_nad83_ras, y = agb2000, method = "ngb")
+plot(studyarea_nad83_ras_rs2000)
+zonal_agb2000 <- zonal(x = agb2000, z = studyarea_nad83_ras_rs, fun = "sum") 
+plot(zonal_agb2000)
+
+zonal_agb2000_m <- as.matrix(zonal_agb2000)
+colnames(zonal_agb2000_m) <- c("Zone", "AGB of total forest land (Kg C m-2)")
+rownames(zonal_agb2000_m) <- studyarea_nad83$NAME
+zonal_agb2000_m
+barplot(zonal_agb2000_m[,2], main="AGB of total forest land 2000", ylab = colnames(zonal_agb2000_m)[2])
+
+```
 
 
 
@@ -87,6 +182,9 @@ plot(biomass_clip)
 5. Web-mapping (visulization) 
 shiny 
 leaflet 
+```{r}
+
+```
 
 
 Data: A brief (~250 words) description and visualization of the datasets you will be using. That means spatial plots of the main datasets and their key values, and, as a bonus, a plot of summary statistics, e.g. a histogram or boxplot of one of the more importants variables in the dataset.
