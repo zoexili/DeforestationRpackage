@@ -76,12 +76,10 @@ st_write(obj = studyarea_nad83, dsn = file.path("inst/extdata/", "studyarea_nad8
 
 ## create a png file 
 #png("external/figures/studyarea_nad83.png", bg = "transparent", height = 4, width = 3, res = 300, units = "in")
-
-## plot 
+## plot
 par(mar = c(0, 0, 1, 0))
 plot(st_geometry(studyarea_nad83[6]), col = rainbow(n = nrow(studyarea_nad83)), main = "Study Area")
 legend(x = "bottomright", pch = 15, col = rainbow(n = nrow(studyarea_nad83)), bty = "n", legend = studyarea_nad83$NAME)
-
 ## close and save the plot into the png file
 #dev.off()
 
@@ -264,5 +262,7 @@ Timelines: Provide a timeline for when each portion of the analysis will be comp
 
 
 Anticipated outcomes: Briefly describe, as bullet points, the outcomes you expect for each of your primary project objectives
+
+
 
 
