@@ -37,14 +37,17 @@ Approach and Method: An outline of the analytical methods and code you plan to u
 3. Comparing forest biomass change between 1990 and 2000
 
 3.1 Data pre-processing
-```{r}
+```{r eval = FALSE}
 library(geospaar)
 library(rgdal)
 library(dplyr)
 
-# install my own package deforestation, run these two lines every time after changing anything in your package. 
+# install your own package 'deforestation', run these two lines every time after changing anything in your package. 
 devtools::document()
 devtools::install()
+
+# Rewrite your branch and clear your large files in git history
+# $ git filter-branch --force --tree-filter 'rm -rf data/' HEAD
 
 library(deforestation)
 # read study area's shapefile
@@ -68,8 +71,18 @@ plot(biomass2, add = TRUE)
 ## Reproject study area shapefile
 studyarea_nad83 <- st_transform(x = studyarea, crs = crs(biomass1))
 studyarea_nad83
-par(mar = rep(0,4))
-plot(studyarea_nad83[6], add = TRUE)
+st_write(obj = studyarea_nad83, dsn = file.path("inst/extdata/", "studyarea_nad83.shp"))
+
+## create a png file 
+png("external/figures/studyarea_nad83.png", bg = "transparent", height = 4, width = 3, res = 300, units = "in")
+
+## plot 
+par(mar = c(0, 0, 1, 0))
+plot(st_geometry(studyarea_nad83[6]), col = rainbow(n = nrow(studyarea_nad83)), main = "Study Area")
+legend(x = "bottomright", pch = 15, col = rainbow(n = nrow(studyarea_nad83)), bty = "n", legend = studyarea_nad83$NAME)
+
+## close and save the plot into the png file
+dev.off()
 
 ## Merge rasters
 biomass_merge <- merge(biomass1, biomass2)
@@ -89,7 +102,8 @@ plot(biomass_clip)
 ## write raster into a new tif and save it in extdata/ 
 writeRaster(biomass_clip, filename = file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif"))
 biomass_FIA_ALD2000 <- raster(file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif"))
-plot(biomass_FIA_ALD2000)
+plot_noaxes(biomass_FIA_ALD2000, main = "Aboveground Live Dry Biomass 2000", legend.args = list(text = expression("kg C m"^-2, "                       y"^-1)))
+# 0-335: low, medium, high. 
 
 # Dataset: Forest Carbon Stocks and Fluxes After Disturbance, SE US
 ## import raster
@@ -132,7 +146,7 @@ plot(agb2000)
 ```
 
 3.2 Table & bar graph: List total quantities of AGB (kg C m-2 y-1) of harvested forest area in 1990 and 2000, over six counties. 
-```{r}
+```{r eval = FALSE}
 # 1990
 ## create empty raster in study area's extent and fill in value
 zonal_ras <- raster(x = extent(studyarea_nad83), crs = crs(studyarea_nad83), res = 30)
