@@ -41,10 +41,11 @@ Approach and Method: An outline of the analytical methods and code you plan to u
 library(geospaar)
 library(rgdal)
 library(dplyr)
+library(ggplot2)
 
 # install your own package 'deforestation', run these two lines every time after changing anything in your package. 
-devtools::document()
-devtools::install()
+# devtools::document()
+# devtools::install()
 
 # Rewrite your branch and clear your large files in git history
 # $ git filter-branch --force --tree-filter 'rm -rf data/' HEAD
@@ -74,7 +75,7 @@ studyarea_nad83
 st_write(obj = studyarea_nad83, dsn = file.path("inst/extdata/", "studyarea_nad83.shp"))
 
 ## create a png file 
-png("external/figures/studyarea_nad83.png", bg = "transparent", height = 4, width = 3, res = 300, units = "in")
+#png("external/figures/studyarea_nad83.png", bg = "transparent", height = 4, width = 3, res = 300, units = "in")
 
 ## plot 
 par(mar = c(0, 0, 1, 0))
@@ -82,7 +83,7 @@ plot(st_geometry(studyarea_nad83[6]), col = rainbow(n = nrow(studyarea_nad83)), 
 legend(x = "bottomright", pch = 15, col = rainbow(n = nrow(studyarea_nad83)), bty = "n", legend = studyarea_nad83$NAME)
 
 ## close and save the plot into the png file
-dev.off()
+#dev.off()
 
 ## Merge rasters
 biomass_merge <- merge(biomass1, biomass2)
@@ -100,10 +101,20 @@ biomass_clip <- raster::mask(x = biomass_crop, mask = studyarea_nad83)
 plot(biomass_clip)
 
 ## write raster into a new tif and save it in extdata/ 
-writeRaster(biomass_clip, filename = file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif"))
-biomass_FIA_ALD2000 <- raster(file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif"))
-plot_noaxes(biomass_FIA_ALD2000, main = "Aboveground Live Dry Biomass 2000", legend.args = list(text = expression("kg C m"^-2, "                       y"^-1)))
-# 0-335: low, medium, high. 
+writeRaster(biomass_clip, 
+            filename = file.path("inst/extdata/","biomass_FIA_ALD_2000.tif"))
+biomass_FIA_ALD2000 <- raster(
+  file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif")
+  )
+
+## kg/m2 = [Digital Number] / 10
+biomass_FIA_ALD2000_kgC <- biomass_FIA_ALD2000/10 
+
+## save png file
+#png("external/figures/biomass_FIA_ALD2000.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+plot_noaxes(biomass_FIA_ALD2000_kgC, main = "Aboveground Live Dry Biomass 2000", legend.args = list(text = expression("Kg C m"^-2)))
+#dev.off()
+
 
 # Dataset: Forest Carbon Stocks and Fluxes After Disturbance, SE US
 ## import raster
@@ -135,58 +146,93 @@ biomass4_clip <- raster::mask(x = biomass4_crop, mask = studyarea_nad83)
 plot(biomass4_clip)
 
 # write rasters into extdata/
-writeRaster(biomass3_clip, filename = file.path("inst/extdata/", "agb1990.tif"))
-agb1990 <- raster(file.path("inst/extdata/", "agb1990.tif"))
-plot(agb1990)
+writeRaster(biomass3_clip, 
+            filename = file.path("inst/extdata/", "agb1990.tif"))
+agb1990 <- raster(
+            file.path("inst/extdata/", "agb1990.tif")
+            )
 
-writeRaster(biomass4_clip, filename = file.path("inst/extdata/", "agb2000.tif"))
-agb2000 <- raster(file.path("inst/extdata/", "agb2000.tif"))
-plot(agb2000)
+# unit converted from g to kg 
+agb1990_kgC <- agb1990 / 1000
+
+#png("external/figures/agb1990.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+plot_noaxes(agb1990_kgC, main = "Aboveground Woody Biomass 1990", legend.args = list(text = expression("kg C m"^-2)))
+#dev.off()
+
+writeRaster(biomass4_clip, 
+            filename = file.path("inst/extdata/", "agb2000.tif"))
+agb2000 <- raster(
+  file.path("inst/extdata/", "agb2000.tif")
+  )
+agb2000_kgC <- agb2000 / 1000
+#png("external/figures/agb2000.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+plot_noaxes(agb2000_kgC, main = "Aboveground Woody Biomass 2000", legend.args = list(text = expression("kg C m"^-2)))
+#dev.off()
 
 ```
 
-3.2 Table & bar graph: List total quantities of AGB (kg C m-2 y-1) of harvested forest area in 1990 and 2000, over six counties. 
-```{r eval = FALSE}
+3.2 Table & bar graph: List total quantities of AGB (g C m-2) of total forest area in 1990 and 2000, over six counties. 
+```{r}
 # 1990
 ## create empty raster in study area's extent and fill in value
 zonal_ras <- raster(x = extent(studyarea_nad83), crs = crs(studyarea_nad83), res = 30)
 values(zonal_ras) <- 1:ncell(zonal_ras)
+zonal_ras
 
-## convert vector to raster
+## convert study area vector to raster
 studyarea_nad83_ras <- studyarea_nad83 %>% rasterize(x = ., y = zonal_ras) 
 plot(studyarea_nad83_ras)
 
 ## zonal statistics
 ### resample studyarea_nad83_ras to the parameters of agb1990, so the extent matches between data. 
-studyarea_nad83_ras_rs <- resample(x = studyarea_nad83_ras, y = agb1990, method = "ngb")
+studyarea_nad83_ras_rs <- resample(x = studyarea_nad83_ras, y = agb1990_kgC, method = "ngb")
 plot(studyarea_nad83_ras_rs)
-zonal_agb1990 <- zonal(x = agb1990, z = studyarea_nad83_ras_rs, fun = "sum") 
-plot(zonal_agb1990)
+zonal_agb1990 <- zonal(x = agb1990_kgC, z = studyarea_nad83_ras_rs, fun = "sum") 
+zonal_agb1990
 
-## convert list to matrix and change row/col names
-zonal_agb1990_m <- as.matrix(zonal_agb1990)
-colnames(zonal_agb1990_m) <- c("Zone", "AGB of total forest land (Kg C m-2)")
-rownames(zonal_agb1990_m) <- studyarea_nad83$NAME
-
-
-## table
-zonal_agb1990_m
+## convert list to data frame and change row/col names
+zonal_agb1990_df <- as.data.frame(zonal_agb1990)
+colnames(zonal_agb1990_df) <- c("Zone", "AGB of total forest land (Kg C m-2)")
+rownames(zonal_agb1990_df) <- studyarea_nad83$NAME
+zonal_agb1990_df  ## table
 
 ## bar graph
-barplot(zonal_agb1990_m[,2], main="AGB of total forest land 1990", ylab = colnames(zonal_agb1990_m)[2])
+zonal_agb1990_df$Name <- studyarea_nad83$NAME
+
+#png("external/figures/bar_agb1990.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+ggplot(data = zonal_agb1990_df, aes(x = Name, y = `AGB of total forest land (Kg C m-2)`, fill = Name)) +
+  geom_bar(colour = "black", stat="identity")+
+  theme_classic()
+#dev.off()
 
 # 2000
-studyarea_nad83_ras_rs2000 <- resample(x = studyarea_nad83_ras, y = agb2000, method = "ngb")
+studyarea_nad83_ras_rs2000 <- resample(x = studyarea_nad83_ras, y = agb2000_kgC, method = "ngb")
 plot(studyarea_nad83_ras_rs2000)
-zonal_agb2000 <- zonal(x = agb2000, z = studyarea_nad83_ras_rs, fun = "sum") 
+zonal_agb2000 <- zonal(x = agb2000_kgC, z = studyarea_nad83_ras_rs, fun = "sum") 
 plot(zonal_agb2000)
 
-zonal_agb2000_m <- as.matrix(zonal_agb2000)
-colnames(zonal_agb2000_m) <- c("Zone", "AGB of total forest land (Kg C m-2)")
-rownames(zonal_agb2000_m) <- studyarea_nad83$NAME
-zonal_agb2000_m
-barplot(zonal_agb2000_m[,2], main="AGB of total forest land 2000", ylab = colnames(zonal_agb2000_m)[2])
+zonal_agb2000_df <- as.data.frame(zonal_agb2000)
+colnames(zonal_agb2000_df) <- c("Zone", "AGB of total forest land (Kg C m-2)")
+rownames(zonal_agb2000_df) <- studyarea_nad83$NAME
+zonal_agb2000_df
 
+zonal_agb2000_df$Name <- studyarea_nad83$NAME
+
+#png("external/figures/bar_agb2000.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+ggplot(data = zonal_agb2000_df, aes(x = Name, y = `AGB of total forest land (Kg C m-2)`, fill = Name)) +
+  geom_bar(colour = "black", stat="identity")+
+  theme_classic()
+#dev.off()
+
+# Join two dfs and create one bar graph
+df <- full_join(x = zonal_agb1990_df, y = zonal_agb2000_df)
+df$year <- c("1990","1990" , "1990", "1990", "1990", "1990", "2000", "2000", "2000", "2000", "2000", "2000")  # year column needs to be character, not numeric.
+
+#png("external/figures/bar_agb.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+ggplot(data = df, aes(x = Name, y = `AGB of total forest land (Kg C m-2)`, fill = year)) +
+  geom_bar(colour = "black", stat="identity", position = position_dodge2())+
+  theme_classic()
+#dev.off()
 ```
 
 
