@@ -14,10 +14,6 @@ knitr::opts_chunk$set(
 )
 ```
 
-```{r setup}
-#library(ProjectDeforestation)
-```
-
 Title: Deforestation and carbon balance in Southern Virginia, U.S. between 1990 and 2000
 
 Summary:A brief (up to 250 words) description of the project, and a bullet point or enumerated list of its primary objectives.
