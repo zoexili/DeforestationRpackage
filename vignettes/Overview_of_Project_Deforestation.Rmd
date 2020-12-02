@@ -1,0 +1,107 @@
+---
+title: "Overview of Project Deforestation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Overview}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup}
+#library(ProjectDeforestation)
+```
+
+Title: Deforestation and carbon balance in Southern Virginia, U.S. between 1990 and 2000
+
+Summary:A brief (up to 250 words) description of the project, and a bullet point or enumerated list of its primary objectives.
+
+This study intends to understand the connection among deforestation, carbon, and biomass in Virginia. We are interested in how deforestation between 1990 and 2000 affects carbon stock and biomass in Virginia.  
+
+...
+
+
+Approach and Method: An outline of the analytical methods and code you plan to use, including the names of key packages that you will draw on. This section should be composed of the following sub-sections:
+
+1. Quantifying forest harvest between 1990 and 2000
+
+Expected Deliverables: 
+1.NAFD 1990 map of study area
+2.NAFD 2000 map of study area
+3.MTBS map of study area (Use this map as a spatial filter to screen out fire occurred between 1989, 1990, 1991 & 1999, 2000, 2001 in your study area)
+4.forest extent map 1990 (acre)
+5.Forest harvest area (acre) map 
+If Forested Pixel in 1990 is changed to non-forested pixel in 2000, 
+Then this pixel is harvested. 
+6.Forest harvest percentage map (percent = forest harvested area / total forest extent 1990 * 100%) 
+7.Table: Total acres of forest harvest in 6 counties & Total acres of forest extent in 6 counties 1990 & Forest harvest percentage in 6 counties. 
+8.Bar graph: Total acres of forest harvest in 6 counties. Y axis: Harvested area. X axis: states.
+9.Bar graph: Total acres of forest extent in 6 counties 1990.
+10. Bar graph: Forest harvest percentage in 6 counties. 
+11.Choose a few visualization methods to display your maps (mapview, shiny, etc). 
+
+
+2. Comparing forest carbon stock change between 1990 and 2000
+
+Expected Deliverables:
+1.Net ecosystem productivity 1990 of study area
+2.Net ecosystem productivity 2000 of study area
+3.Table & bar graph: List total quantities of NEP (g C m-2 y-1) of harvested forest area between 1990 and 2000, over six counties. (each county has one bar) 12 bars
+4.Table and bar graph: total NEP of undisturbed forest area in 1990 and 2000 over six counties.
+5. Table and bar graph: total NEP of all forest areas (including harvested and non-harvested) in 1990 and 2000 over six counties. 
+6. Choose a few visualization methods to display your maps (mapview, shiny, etc).  
+
+3. Comparing forest biomass change between 1990 and 2000
+Expected Deliverables:
+1.Aboveground woody biomass 1990
+2.AGB 2000 & NBCD aboveground live dry biomass 
+3.Table & bar graph: List total quantities of AGB (kg C m-2 y-1) of harvested forest area in 1990 and 2000, over six counties. 
+4.Table and bar graph: total NEP of undisturbed forest area in 1990 and 2000 over six counties.
+5.Table and bar graph: total AGB of all forest areas (including harvested and non-harvested) in 1990 and 2000 over six counties. 
+
+
+4. Examine the connections among forest harvest, forest carbon stock change, and biomass change between 1990 and 2000 
+
+
+5. Web-mapping (visulization) 
+shiny 
+leaflet 
+
+
+Data: A brief (~250 words) description and visualization of the datasets you will be using. That means spatial plots of the main datasets and their key values, and, as a bonus, a plot of summary statistics, e.g. a histogram or boxplot of one of the more importants variables in the dataset.
+
+NAFD: North American forest dynamics
+MTBS: the Monitoring Trends in Burn Severity
+Forest Carbon Stocks and Fluxes After Disturbance, Southeastern USA, 1990-2010
+NBCD: NACP Aboveground Biomass and Carbon Baseline Data, V[ersion]. 2
+
+Code: A bullet point summary of the analysis and coding approach that you propose to follow. For teams, this section should include a description of which member will be responsible for each bullet point.
+
+(Remember to save output to PNG file, so it saves time of processing)
+
+Timelines: Provide a timeline for when each portion of the analysis will be completed. These timelines should be constructed relative to the time period of presentations (during the last two weeks of class) and final project submission (during exam week). For teams, names should be associated with each step on the timeline.
+
+11.16-11.20: It is recommended for each team member to finish the code section, and save all deliverables as png files. 
+
+11.23 - 11.27: Finish the write-up of data, method and all other sections. 
+Summary - 
+Data:  Introduce our datasets. 
+NAFD (Jianing)
+MTBS (Jianing)
+NBCD (Li)
+Southeastern carbon stock dataset (Novak, Li) 
+Methods: Team members are expected to write for their own part. 
+
+Presentation + recording. 
+
+11.30 - 12.4 (Course completion week). 
+
+Anticipated outcomes: Briefly describe, as bullet points, the outcomes you expect for each of your primary project objectives
+
+
