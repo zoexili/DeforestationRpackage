@@ -45,6 +45,7 @@ Biomass data were extracted from the National Aboveground Biomass and Carbon Bas
 ### 3.1 Forest area change between 1990 and 2000  (Jianing) 
 
 Figure 1 shows our study region, six counties from Virginia. As we can see from figure 2, the forest extent map of 1990, which represents the forest cover area in 1990 across the study area. The forest harvest map (figure 3) shows the forest degeneration from 1990 to 2000. While, refers to figure 4, most areas of the study region weren’t disturbed during the 10 years. As for the forest harvest percentage map (figure 5), most areas are covered by green, which is in line with the result of the former two maps. Table 1 shows the total forest harvest area in each county. Brunswick county had the biggest forest harvest area (160948 acres) followed by Sussex county (134145 acres), while there were only 68166 acres forest disappeared in Greensville county during the given years. The total forest area in 1990 of Brunswick was the biggest among the six counties (1137933 acres), while the Greensville county, with 545649 acres, had the smallest forest area in 1990. (Refer to table 2). Table 3 shows the forest harvest percentage, Sussex county, with 0.147% percent of forest degeneration, suffered the most severe forest loss during the given year followed by 0.141% percent in Brunswick county and there was only 0.091% forest loss in Mecklenburg county. The three bar graphs (figure6-8) also show the same information as table but in a more visually direct way. 
+
 ### 3.2 Forest carbon stock change between 1990 and 2000  (Novak) 
 
 Figure 9 shows a visual representation of the change of net ecosystem productivity (NEP) between 1990 and 2000. Overall, we can see a trend of decreasing amount of NEP from 1990 to 2000. Brunswick County has the largest amount of NEP across all six counties in both 1990 and 2000. The biggest decrease of NEP is also observed in Brunswick County with a decrease of 46,541,717g C m-2year-1 from 1990 to 2000 followed by a decrease of 32,846,791g C m-2year-1 in Lunenberg. 
@@ -52,21 +53,348 @@ Figure 9 shows a visual representation of the change of net ecosystem productivi
 Further analyses on harvested areas and undisturbed areas show a similar trend of results with Brunswick county having the most amount of NEP and Greensville having the least.
 
 ### 3.3 Forest biomass change between 1990 and 2000 (Li) 
+
 Figure 10-12 shows aboveground woody biomass (AGB) in 1990 and 2000 collected from two different datasets. The SE forest carbon stock dataset shows that the total AGB in 1990 and 2000 ranges from about 1 to 11 kg C per square meter. Differently, the NBCD dataset represents a much larger range of AGB estimates for our study area, about 0 to 32 kg C per square meter. One potential reason causing this distinct difference is due to different biomass measuring approaches.   
+
 In Figure 13, the biomass of total forest land is shown to be decreased from 1990 to 2000 because of frequent forest harvesting events in the study region. Since the NBCD dataset provides a much larger estimate of biomass which makes comparison impossible, we decide to ignore it. Figure 14 shows that Brunswick is the county that lost the highest amount of biomass from harvest events, followed by Sussex, Lunenburg, Mecklenburg, Dinwiddie, and Greensville. Figure 15 shows that Mecklenburg maintains the highest undisturbed biomass, followed by Brunswick, Dinwiddie, Lunenberg, Sussex, and Greensville. 
 
+#### 3.3.1 Data pre-processing
+```{r, set up, message = FALSE}
+library(geospaar)
+library(rgdal)
+library(dplyr)
+library(ggplot2)
+library(knitr)
+library(deforestation)
+library(tmap)
+library(rasterVis)
+library(mapview)
+library(here)
+```
+
+```{r, eval = FALSE}
+# install your own package 'deforestation', run these two lines every time after changing anything in your package. 
+#devtools::document()
+#devtools::install()
+#library(deforestation)
+
+# Rewrite your branch and clear your large files in git history
+# $ git filter-branch --force --tree-filter 'rm -rf data/' HEAD
+
+
+# read study area's shapefile
+# use relevant paths in the package, not full paths
+studyarea <- system.file("extdata/VA_STUDYAREA.shp", package = "deforestation")
+studyarea <- st_read(studyarea)
+studyarea
+
+# Dataset: NBCD V2 2000
+## import raster (FIA ALD biomass)
+path1 <- "C:/Users/Li/Desktop/geog_346/NBCD_MZ60_FIA_ALD_biomass/NBCD_MZ60_FIA_ALD_biomass.tif"
+biomass1 <- raster(path1)
+biomass1
+plot(biomass1)
+
+path2 <- "C:/Users/Li/Desktop/geog_346/NBCD_MZ59_FIA_ALD_biomass/NBCD_MZ59_FIA_ALD_biomass.tif"
+biomass2 <- raster(path2)
+biomass2
+plot(biomass2, add = TRUE)
+
+## Reproject study area shapefile
+studyarea_nad83 <- st_transform(x = studyarea, crs = crs(biomass1))
+studyarea_nad83
+studyarea_nad83 <- studyarea_nad83 %>% select(-GEOID, -COUNTYNS, -LSAD, -CLASSFP, -MTFCC, -CSAFP, -CBSAFP, -METDIVFP, -FUNCSTAT, -ALAND, -AWATER, -INTPTLAT, -INTPTLON, -SHAPE_Leng, -SHAPE_Area)
+
+st_write(obj = studyarea_nad83, dsn = file.path("inst/extdata/", "studyarea_nad83.shp"), delete_layer = TRUE)
+
+
+## create a png file 
+#png("external/figures/studyarea_nad83.png", bg = "transparent", height = 4, width = 3, res = 300, units = "in")
+## plot
+par(mar = c(0, 0, 1, 0))
+plot(st_geometry(studyarea_nad83), col = rainbow(n = nrow(studyarea_nad83)), main = "Study Area")
+legend(x = "bottomright", pch = 15, col = rainbow(n = nrow(studyarea_nad83)), bty = "n", legend = studyarea_nad83$NAME)
+## close and save the plot into the png file
+#dev.off()
+
+# tmap
+#png("external/figures/studyarea_nad83_tmap.png", bg = "transparent", height = 4, width = 3, res = 300, units = "in")
+tm_shape(studyarea_nad83) +
+  tm_polygons(col = "MAP_COLORS", palette = "Pastel1")
+#dev.off()
+
+## Merge rasters
+biomass_merge <- merge(biomass1, biomass2)
+biomass_merge
+plot(biomass_merge)
+
+## crop raster
+biomass_crop <- crop(x = biomass_merge, y = studyarea_nad83)
+biomass_crop
+plot(biomass_crop)
+plot(st_geometry(studyarea_nad83), col = rgb(1, 1, 1, alpha = 0), add = TRUE)
+
+## mask raster
+biomass_clip <- raster::mask(x = biomass_crop, mask = studyarea_nad83)
+plot(biomass_clip)
+
+## write raster into a new tif and save it in extdata/ 
+writeRaster(biomass_clip, 
+            filename = file.path("inst/extdata/","biomass_FIA_ALD_2000.tif"))
+biomass_FIA_ALD2000 <- raster(
+  file.path("inst/extdata/", "biomass_FIA_ALD_2000.tif")
+  )
+
+## kg/m2 = [Digital Number] / 10
+biomass_FIA_ALD2000_kgC <- biomass_FIA_ALD2000/10 
+
+## save png file
+#png("external/figures/biomass_FIA_ALD2000.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+plot_noaxes(biomass_FIA_ALD2000_kgC, main = "Aboveground Live Dry Biomass 2000", legend.args = list(text = expression("Kg C m"^-2)))
+#dev.off()
+
+
+# Dataset: Forest Carbon Stocks and Fluxes After Disturbance, SE US
+## import raster
+path3 <- "C:/Users/Li/Desktop/geog_346/agb_1990.tif"
+biomass3 <- raster(path3)
+biomass3
+plot(biomass3)
+
+path4 <- "C:/Users/Li/Desktop/geog_346/agb_2000.tif"
+biomass4 <- raster(path4)
+biomass4
+plot(biomass4)
+
+## crop raster 
+biomass3_crop <- crop(x = biomass3, y = studyarea_nad83)
+biomass3_crop
+plot(biomass3_crop)
+plot(st_geometry(studyarea_nad83), col = rgb(1, 1, 1, alpha = 0), add = TRUE)
+
+biomass4_crop <- crop(x = biomass4, y = studyarea_nad83)
+biomass4_crop
+plot(biomass4_crop)
+
+## mask raster
+biomass3_clip <- raster::mask(x = biomass3_crop, mask = studyarea_nad83)
+plot(biomass3_clip)
+
+biomass4_clip <- raster::mask(x = biomass4_crop, mask = studyarea_nad83)
+plot(biomass4_clip)
+
+# write rasters into extdata/
+writeRaster(biomass3_clip, 
+            filename = file.path("inst/extdata/", "agb1990.tif"))
+agb1990 <- raster(
+            file.path("inst/extdata/", "agb1990.tif")
+            )
+
+# unit converted from g to kg 
+agb1990_kgC <- agb1990 / 1000
+
+#png("external/figures/agb1990.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+plot_noaxes(agb1990_kgC, main = "Aboveground Woody Biomass 1990", legend.args = list(text = expression("kg C m"^-2)))
+#dev.off()
+
+# rastervis
+png("external/figures/agb1990_rastervis.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+levelplot(agb1990_kgC)
+dev.off()
+
+# mapview - cannot save to png
+mapview(studyarea_nad83, alpha.regions = 0, legend = T) + mapview(agb1990_kgC)
+
+
+# agb2000
+writeRaster(biomass4_clip, 
+            filename = file.path("inst/extdata/", "agb2000.tif"))
+agb2000 <- raster(
+  file.path("inst/extdata/", "agb2000.tif")
+  )
+agb2000_kgC <- agb2000 / 1000
+#png("external/figures/agb2000.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+plot_noaxes(agb2000_kgC, main = "Aboveground Woody Biomass 2000", legend.args = list(text = expression("kg C m"^-2)))
+#dev.off()
+
+# rastervis
+png("external/figures/agb2000_rastervis.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+levelplot(agb2000_kgC)
+dev.off()
+
+# mapview
+mapview(studyarea_nad83, alpha.regions = 0, legend = T) + mapview(agb2000_kgC)
+```
+
+#### 3.3.2 Table & bar graph: List total quantities of AGB (kg C m-2) of total forest area in 1990 and 2000, over six counties. 
+```{r, eval = FALSE}
+# 1990
+## create empty raster in study area's extent and fill in value
+zonal_ras <- raster(x = extent(studyarea_nad83), crs = crs(studyarea_nad83), res = 30)
+values(zonal_ras) <- 1:ncell(zonal_ras)
+zonal_ras
+
+## convert study area vector to raster
+studyarea_nad83_ras <- studyarea_nad83 %>% rasterize(x = ., y = zonal_ras) 
+plot(studyarea_nad83_ras)
+
+## zonal statistics
+### resample studyarea_nad83_ras to the parameters of agb1990, so the extent matches between data. 
+studyarea_nad83_ras_rs <- resample(x = studyarea_nad83_ras, y = agb1990_kgC, method = "ngb")
+plot(studyarea_nad83_ras_rs)
+zonal_agb1990 <- zonal(x = agb1990_kgC, z = studyarea_nad83_ras_rs, fun = "sum") 
+zonal_agb1990
+
+## convert list to data frame and change row/col names
+zonal_agb1990_df <- as.data.frame(zonal_agb1990)
+colnames(zonal_agb1990_df) <- c("Zone", "AGB of total forest land (Kg C m-2)")
+rownames(zonal_agb1990_df) <- studyarea_nad83$NAME
+zonal_agb1990_df  ## table
+
+## bar graph
+zonal_agb1990_df$Name <- studyarea_nad83$NAME
+
+# 2000 
+studyarea_nad83_ras_rs2000 <- resample(x = studyarea_nad83_ras, y = agb2000_kgC, method = "ngb")
+plot(studyarea_nad83_ras_rs2000)
+zonal_agb2000 <- zonal(x = agb2000_kgC, z = studyarea_nad83_ras_rs2000, fun = "sum") 
+plot(zonal_agb2000)
+
+zonal_agb2000_df <- as.data.frame(zonal_agb2000)
+colnames(zonal_agb2000_df) <- c("Zone", "AGB of total forest land (Kg C m-2)")
+rownames(zonal_agb2000_df) <- studyarea_nad83$NAME
+zonal_agb2000_df
+
+zonal_agb2000_df$Name <- studyarea_nad83$NAME
+
+# 2000 NBCD FIA ALD dataset
+studyarea_nad83_ras_rs2000 <- resample(x = studyarea_nad83_ras, y = biomass_FIA_ALD2000_kgC, method = "ngb")
+zonal_NBCD2000 <- zonal(x = biomass_FIA_ALD2000_kgC, z = studyarea_nad83_ras_rs2000, fun = "sum") 
+plot(zonal_NBCD2000)
+
+zonal_NBCD2000_df <- as.data.frame(zonal_NBCD2000)
+colnames(zonal_NBCD2000_df) <- c("Zone", "AGB of total forest land (Kg C m-2)")
+rownames(zonal_NBCD2000_df) <- studyarea_nad83$NAME
+zonal_NBCD2000_df
+
+zonal_NBCD2000_df$Name <- studyarea_nad83$NAME
+
+# Join two dfs and create one bar graph
+df <- full_join(x = zonal_agb1990_df, y = zonal_agb2000_df) %>% full_join(., zonal_NBCD2000_df)
+df$year <- c("1990","1990" , "1990", "1990", "1990", "1990", "2000", "2000", "2000", "2000", "2000", "2000","2000", "2000", "2000", "2000", "2000", "2000")  # year column needs to be character, not numeric.
+
+png("external/figures/bar_agb.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+ggplot(data = df, aes(x = Name, y = `AGB of total forest land (Kg C m-2)`, fill = year)) +
+  geom_bar(colour = "black", stat="identity", position = position_dodge2())+
+  scale_fill_brewer(palette="Paired")+
+  theme_classic()
+dev.off()
+```
+
+#### 3.3.3 Table & bar graph: List lost quantities of AGB (kg C m-2) of harvested forest area between 1990 and 2000, over six counties. 
+```{r, eval = FALSE}
+loss <- raster("C:/Users/Li/Desktop/geog_346/deforestation/inst/extdata/forest_loss.tif")
+
+# rebuild loss extent to make it to match agb1990_kgC
+loss_v2 <- raster(vals=values(loss), ext=extent(agb1990_kgC), crs=crs(agb1990_kgC), nrows=dim(loss)[1],ncols=dim(loss)[2])
+loss_v2[loss_v2 == 0] <- NA  # set 0 to NA
+
+# mask agb1990_kgC using the loss_v2
+loss1990clip <- raster::mask(x = agb1990_kgC, mask = loss_v2)
+
+# Resampling
+studyarea_nad83_ras_loss1990 <- resample(x = studyarea_nad83_ras, y = loss1990clip, method = "ngb")
+
+# Zonal statistics
+zonal_loss1990clip <- zonal(x = loss1990clip, z = studyarea_nad83_ras_loss1990, fun = "sum") 
+
+# convert to data frame and create table
+zonal_loss1990_df <- as.data.frame(zonal_loss1990clip)
+colnames(zonal_loss1990_df) <- c("Zone", "AGB of harvested forest land (Kg C m-2)")
+rownames(zonal_loss1990_df) <- studyarea_nad83$NAME
+zonal_loss1990_df
+
+# Add name column to data frame
+zonal_loss1990_df$Name <- studyarea_nad83$NAME
+
+# Bar graph - harvested agb between 1990 and 2000
+png("external/figures/bar_agb_harvested.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+ggplot(data = zonal_loss1990_df, aes(x = Name, y = `AGB of harvested forest land (Kg C m-2)`, fill = Name)) +
+  geom_bar(colour = "black", stat="identity")+
+  scale_fill_brewer(palette="Set2")+
+  theme_classic()
+dev.off()
+```
+
+#### 3.3.4 Table & bar graph: List total quantities of AGB (kg C m-2) of undisturbed forest area between 1990 and 2000, over six counties.
+```{r, eval = FALSE}
+# read raster
+undisturbed <- raster("C:/Users/Li/Desktop/geog_346/deforestation/inst/extdata/forest_nondisturbances.tif")
+
+# rebuild raster to match extent of agb raster, and set 0 to na
+undisturbed_v2 <- raster(vals=values(undisturbed), ext=extent(agb1990_kgC), crs=crs(agb1990_kgC), nrows=dim(undisturbed)[1],ncols=dim(undisturbed)[2])
+undisturbed_v2[undisturbed_v2 == 0] <- NA  # set 0 to NA
+
+# masking
+Undisturbed1990clip <- raster::mask(x = agb1990_kgC, mask = undisturbed_v2)
+
+# resampling
+studyarea_nad83_ras_undisturb1990 <- resample(x = studyarea_nad83_ras, y = Undisturbed1990clip, method = "ngb")
+
+# zonal statistics
+zonal_undisturb1990clip <- zonal(x = Undisturbed1990clip, z = studyarea_nad83_ras_undisturb1990, fun = "sum") 
+
+# convert to data frame and create table
+zonal_undisturb1990_df <- as.data.frame(zonal_undisturb1990clip)
+colnames(zonal_undisturb1990_df) <- c("Zone", "AGB of undisturbed forest land (Kg C m-2)")
+rownames(zonal_undisturb1990_df) <- studyarea_nad83$NAME
+zonal_undisturb1990_df
+
+zonal_undisturb1990_df$Name <- studyarea_nad83$NAME
+
+# Bar graph - Undisturbed agb between 1990 and 2000
+png("external/figures/bar_agb_undisturbed.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+ggplot(data = zonal_undisturb1990_df, aes(x = Name, y = `AGB of undisturbed forest land (Kg C m-2)`, fill = Name)) +
+  geom_bar(colour = "black", stat="identity")+
+  scale_fill_brewer(palette="Set2")+
+  theme_classic()
+dev.off()
+```
+
+```{r, out.width = "80%", fig.pos="h"}
+# Figure 10: Aboveground woody biomass 1990 map. (SE forest carbon stock dataset). 
+knitr::include_graphics(here('external/figures/agb1990.png'))
+knitr::include_graphics(here('external/figures/agb1990_rastervis.png'))
+# Figure 11: Aboveground woody biomass 2000 map. (SE forest carbon stock dataset). 
+knitr::include_graphics(here('external/figures/agb2000.png'))
+knitr::include_graphics(here('external/figures/agb2000_rastervis.png'))
+# Figure 12: Aboveground woody biomass 2000 map. (NBCD dataset).
+knitr::include_graphics(here('external/figures/biomass_FIA_ALD2000.png'))
+# Figure 13: Bar graph of AGB for total forest land. The middle bar is from the SE forest carbon stock dataset, while the right bar is from the NBCD dataset. 
+knitr::include_graphics(here('external/figures/bar_agb.png'))
+# Figure 14: Bar graph of AGB lost between 1990 and 2000. 
+knitr::include_graphics(here('external/figures/bar_agb_harvested.png'))
+# Figure 15: Bar graph of AGB undisturbed between 1990 and 2000. 
+knitr::include_graphics(here('external/figures/bar_agb_undisturbed.png'))
+
+```
+
 ## 4. Discussion and conclusion. 
-During the forest dynamics analysis, we learnt many new packages, functions and improved our problem-solving skill. We learnt using the “here” package to locate our files relative to project root. And a “gridExtra” package to arrange our data frame and draw tables. To save our result into the png format, we used the “png” and “dev.off” function. “knitr::include_graphics” function helped us to display our outputs in an easier way. We also tried to use Monitoring Trends in Burn Severity (MTBS) data to filter our forest cover map, but after cropping and masking the data, we found that there was no overlap between these two datasets, which means there is no burned area in our study area. 
+
+During the forest dynamics analysis, we learnt many new packages, functions and improved our problem-solving skill. We learnt using the “here” package to locate our files relative to project root. And a “gridExtra” package to arrange our data frame and draw tables. To save our result into the png format, we used the “png” and “dev.off” function. “Knitr::include_graphics” function helped us to display our outputs in an easier way. We also tried to use Monitoring Trends in Burn Severity (MTBS) data to filter our forest cover map, but after cropping and masking the data, we found that there was no overlap between these two datasets, which means there is no burned area in our study area. 
 
 In this project, we have met many challenges and uncertainties. Jianing spent a lot of time debugging when she tried to rasterize the study area shapefile and finally found that she missed the resolution value, which reminded her of paying more attention to details. Also, she wanted to emphasize that nobody should forget to resample before using the “zonal” function. Li had trouble building and installing our group project package. She also encountered errors while uploading large files (>100 MB) onto Github. Later on, she learnt to use the “git filter-branch” function to rewrite the git history and only submit files smaller than 100 MB on Github. She also became more familiar with “devtools” after several tries of building R packages.   
 
-In order to develop this project further, we would like to explore the time series trajectory of forest clearing, carbon stock, and biomass change based on the datasets we have. We also want to learn more about the shiny and leaflet frameworks to display our project in a more data-user-friendly way. We also would like to explore the time series trajectory of forest clearing, carbon stock, and biomass change based on the datasets we have. 
+In order to develop this project further, we would like to explore the time series trajectories of forest clearing, carbon stock, and biomass change based on the datasets we have. We also want to learn more about the shiny and leaflet frameworks to display our project in a more data-user-friendly way. We also would like to explore the time series trajectory of forest clearing, carbon stock, and biomass change based on the datasets we have. 
 
 ## 5.References
 
 Foley, J.A., DeFries, R., Asner, G.P., Barford, C., Bonan, G., Carpenter, S.R., Chapin, F.S., Coe, M.T., Daily, G.C., Gibbs, H.K., Helkowski, J.H., Holloway, T., Howard, E.A., Kucharik, C.J., Monfreda, C., Patz, J.A., Prentice, C., Ramankutty, N., & Snyder, P.K. (2005). Global Consequences of Land Use. Science, 309, 570-574. 
+
 Hansen, M.C., Potapov, P., Moore, R., Hancher, M., Turubanova, S., Tyukavina, A., Thau, D., Stehman, S., Goetz, S., Loveland, T., Kommareddy, A., Egorov, A., Chini, L., Justice, C.O., & Townshend, J. (2013). High-Resolution Global Maps of 21st-Century Forest Cover Change. Science, 342, 850-853.
+
 Masek, J. G., Cohen, W. B., Leckie, D., Wulder,, M. A., Vargas, R., de Jong, B., et al. (2011). Recent rates of forest harvest and conversion in North America. Journal of Geophysical Research, 116(G4), 1–22. http://dx.doi.org/10.1029/2010JG001471.
+
 Potapov, P.V., Hansen, M.C., Laestadius, L., Turubanova, S., Yaroshenko, A., Thies, C., Smith, W., Zhuravleva, I., Komarova, A., Minnemeyer, S., & Esipova, E. (2017). The Last Frontiers of Wilderness: Tracking Loss of Intact Forest Landscapes from 2000 to 2013. Science Advances, 3, 1-13.
 
 
