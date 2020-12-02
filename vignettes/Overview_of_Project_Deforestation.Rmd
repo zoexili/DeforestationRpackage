@@ -31,57 +31,43 @@ Approach and Method: An outline of the analytical methods and code you plan to u
 
 1. Quantifying forest harvest between 1990 and 2000
 
+Expected Deliverables: 
+1.NAFD 1990 map of study area
+2.NAFD 2000 map of study area
+3.MTBS map of study area (Use this map as a spatial filter to screen out fire occurred between 1989, 1990, 1991 & 1999, 2000, 2001 in your study area)
+4.forest extent map 1990 (acre)
+5.Forest harvest area (acre) map 
+If Forested Pixel in 1990 is changed to non-forested pixel in 2000, 
+Then this pixel is harvested. 
+6.Forest harvest percentage map (percent = forest harvested area / total forest extent 1990 * 100%) 
+7.Table: Total acres of forest harvest in 6 counties & Total acres of forest extent in 6 counties 1990 & Forest harvest percentage in 6 counties. 
+8.Bar graph: Total acres of forest harvest in 6 counties. Y axis: Harvested area. X axis: states.
+9.Bar graph: Total acres of forest extent in 6 counties 1990.
+10. Bar graph: Forest harvest percentage in 6 counties. 
+11.Choose a few visualization methods to display your maps (mapview, shiny, etc). 
+
 
 2. Comparing forest carbon stock change between 1990 and 2000
 
+Expected Deliverables:
+1.Net ecosystem productivity 1990 of study area
+2.Net ecosystem productivity 2000 of study area
+3.Table & bar graph: List total quantities of NEP (g C m-2 y-1) of harvested forest area between 1990 and 2000, over six counties. (each county has one bar) 12 bars
+4.Table and bar graph: total NEP of undisturbed forest area in 1990 and 2000 over six counties.
+5. Table and bar graph: total NEP of all forest areas (including harvested and non-harvested) in 1990 and 2000 over six counties. 
+6. Choose a few visualization methods to display your maps (mapview, shiny, etc).  
+
 3. Comparing forest biomass change between 1990 and 2000
-```{r}
-library(geospaar)
-library(rgdal)
-library(dplyr)
-library(raster)
-# read study area's shapefile
-# use relevant paths in the package, not full paths
-studyarea <- file.path("C:/Users/Li/Desktop/geog_346/Virginia_City_County_Census_Boundaries-shp/VA_STUDYAREA.shp")
-studyarea <- st_read(studyarea)
-studyarea
-
-# import raster (FIA ALD biomass)
-path1 <- "C:/Users/Li/Desktop/geog_346/NBCD_MZ60_FIA_ALD_biomass/NBCD_MZ60_FIA_ALD_biomass.tif"
-biomass1 <- raster(path1)
-biomass1
-plot(biomass1)
-
-path2 <- "C:/Users/Li/Desktop/geog_346/NBCD_MZ59_FIA_ALD_biomass/NBCD_MZ59_FIA_ALD_biomass.tif"
-biomass2 <- raster(path2)
-biomass2
-plot(biomass2, add = TRUE)
-
-# Reproject
-studyarea_nad83 <- st_transform(x = studyarea, crs = crs(biomass1))
-studyarea_nad83
-par(mar = rep(0,4))
-plot(studyarea_nad83[6], add = TRUE)
-
-# Merge rasters
-biomass_merge <- merge(biomass1, biomass2)
-biomass_merge
-plot(biomass_merge)
-
-biomass_crop <- crop(x = biomass_merge, y = studyarea_nad83)
-biomass_crop
-plot(biomass_crop)
-plot(st_geometry(studyarea_nad83), col = rgb(1, 1, 1, alpha = 0), add = TRUE)
-
-biomass_clip <- raster::mask(x = biomass_crop, mask = studyarea_nad83)
-plot(biomass_clip)
-
-```
-
-
+Expected Deliverables:
+1.Aboveground woody biomass 1990
+2.AGB 2000 & NBCD aboveground live dry biomass 
+3.Table & bar graph: List total quantities of AGB (kg C m-2 y-1) of harvested forest area in 1990 and 2000, over six counties. 
+4.Table and bar graph: total NEP of undisturbed forest area in 1990 and 2000 over six counties.
+5.Table and bar graph: total AGB of all forest areas (including harvested and non-harvested) in 1990 and 2000 over six counties. 
 
 
 4. Examine the connections among forest harvest, forest carbon stock change, and biomass change between 1990 and 2000 
+
 
 5. Web-mapping (visulization) 
 shiny 
@@ -101,8 +87,20 @@ Code: A bullet point summary of the analysis and coding approach that you propos
 
 Timelines: Provide a timeline for when each portion of the analysis will be completed. These timelines should be constructed relative to the time period of presentations (during the last two weeks of class) and final project submission (during exam week). For teams, names should be associated with each step on the timeline.
 
+11.16-11.20: It is recommended for each team member to finish the code section, and save all deliverables as png files. 
 
+11.23 - 11.27: Finish the write-up of data, method and all other sections. 
+Summary - 
+Data:  Introduce our datasets. 
+NAFD (Jianing)
+MTBS (Jianing)
+NBCD (Li)
+Southeastern carbon stock dataset (Novak, Li) 
+Methods: Team members are expected to write for their own part. 
 
+Presentation + recording. 
+
+11.30 - 12.4 (Course completion week). 
 
 Anticipated outcomes: Briefly describe, as bullet points, the outcomes you expect for each of your primary project objectives
 
