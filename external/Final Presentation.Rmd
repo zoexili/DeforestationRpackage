@@ -1,0 +1,40 @@
+---
+title: "Deforestation and carbon balance in Southern Virginia, U.S. between 1990 and 2000"
+subtitle: Li Xi, Jianing Li, Novak Chen
+output:
+  xaringan::moon_reader:
+    lib_dir: libs
+    css: ["default", "lucy", "middlebury-fonts"]
+    nature:
+      highlightStyle: github
+      highlightLines: true
+      countIncrementalSlides: false
+---
+
+```{r setup, include = FALSE, message = FALSE}
+# knitr::opts_chunk$set(echo = FALSE)
+library(knitr)
+library(here)
+library(deforestation)
+```
+
+### Introduction
+
+- Forest is the largest terrestrial carbon sink stabilizing carbon storage on Earth.
+- About 7-11 million square kilometers of natural forests have been deforested through agricultural expansion and timber harvest during the past 300 years. 
+- Deforestation can affect a wide range of ecological functions, including carbon stocks and biomass accumulations. 
+- In this study, we chose six counties in Southern Virginia to understand the connection among deforestation, carbon, and biomass because forest harvesting events are particularly common in forestland of Virginia. We intend to understand: 
+-- how many forests are deforested in these six counties between 1990 and 2000
+-- how carbon stocks are affected from deforestation
+-- how aboveground woody biomass (AGB) are affected from deforestation.
+
+---
+### Data and Method 
+
+---
+
+### Results
+```{r, out.width = "70%", echo=FALSE, fig.align='center'}
+knitr::include_graphics(here('external/figures/agb2000.png'))
+```
+

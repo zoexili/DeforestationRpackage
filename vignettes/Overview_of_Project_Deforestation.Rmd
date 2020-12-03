@@ -589,9 +589,9 @@ knitr::include_graphics(here("external/figures/nep_undist_1990_df.png"))
 
 ### 3.3 Forest biomass change between 1990 and 2000 (Li) 
 
-Figure 10-12 shows aboveground woody biomass (AGB) in 1990 and 2000 collected from two different datasets. The SE forest carbon stock dataset shows that the total AGB in 1990 and 2000 ranges from about 1 to 11 kg C per square meter. Differently, the NBCD dataset represents a much larger range of AGB estimates for our study area, about 0 to 32 kg C per square meter. One potential reason causing this distinct difference is due to different biomass measuring approaches.   
+Figure 16-18 shows aboveground woody biomass (AGB) in 1990 and 2000 collected from two different datasets. The SE forest carbon stock dataset shows that the total AGB in 1990 and 2000 ranges from about 1 to 11 kg C per square meter. Differently, the NBCD dataset represents a much larger range of AGB estimates for our study area, about 0 to 32 kg C per square meter. One potential reason causing this distinct difference is due to different biomass measuring approaches.   
 
-In Figure 13, the biomass of total forest land is shown to be decreased from 1990 to 2000 because of frequent forest harvesting events in the study region. Since the NBCD dataset provides a much larger estimate of biomass which makes comparison impossible, we decide to ignore it. Figure 14 shows that Brunswick is the county that lost the highest amount of biomass from harvest events, followed by Sussex, Lunenburg, Mecklenburg, Dinwiddie, and Greensville. Figure 15 shows that Mecklenburg maintains the highest undisturbed biomass, followed by Brunswick, Dinwiddie, Lunenberg, Sussex, and Greensville. 
+In Figure 19, the biomass of total forest land is shown to be decreased from 1990 to 2000 because of frequent forest harvesting events in the study region. Since the NBCD dataset provides a much larger estimate of biomass which makes comparison impossible, we decide to ignore it. Figure 20 shows that Brunswick is the county that lost the highest amount of biomass from harvest events, followed by Sussex, Lunenburg, Mecklenburg, Dinwiddie, and Greensville. Figure 21 shows that Mecklenburg maintains the highest undisturbed biomass, followed by Brunswick, Dinwiddie, Lunenberg, Sussex, and Greensville. 
 
 #### 3.3.1 Data pre-processing
 
@@ -885,19 +885,19 @@ dev.off()
 ```
 
 ```{r, out.width = "80%", fig.pos="h"}
-# Figure 10: Aboveground woody biomass 1990 map. (SE forest carbon stock dataset). 
+# Figure 16: Aboveground woody biomass 1990 map. (SE forest carbon stock dataset). 
 knitr::include_graphics(here('external/figures/agb1990.png'))
 knitr::include_graphics(here('external/figures/agb1990_rastervis.png'))
-# Figure 11: Aboveground woody biomass 2000 map. (SE forest carbon stock dataset). 
+# Figure 17: Aboveground woody biomass 2000 map. (SE forest carbon stock dataset). 
 knitr::include_graphics(here('external/figures/agb2000.png'))
 knitr::include_graphics(here('external/figures/agb2000_rastervis.png'))
-# Figure 12: Aboveground woody biomass 2000 map. (NBCD dataset).
+# Figure 18: Aboveground woody biomass 2000 map. (NBCD dataset).
 knitr::include_graphics(here('external/figures/biomass_FIA_ALD2000.png'))
-# Figure 13: Bar graph of AGB for total forest land. The middle bar is from the SE forest carbon stock dataset, while the right bar is from the NBCD dataset. 
+# Figure 19: Bar graph of AGB for total forest land. The middle bar is from the SE forest carbon stock dataset, while the right bar is from the NBCD dataset. 
 knitr::include_graphics(here('external/figures/bar_agb.png'))
-# Figure 14: Bar graph of AGB lost between 1990 and 2000. 
+# Figure 20: Bar graph of AGB lost between 1990 and 2000. 
 knitr::include_graphics(here('external/figures/bar_agb_harvested.png'))
-# Figure 15: Bar graph of AGB undisturbed between 1990 and 2000. 
+# Figure 21: Bar graph of AGB undisturbed between 1990 and 2000. 
 knitr::include_graphics(here('external/figures/bar_agb_undisturbed.png'))
 
 ```
