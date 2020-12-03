@@ -15,7 +15,7 @@ output:
 # knitr::opts_chunk$set(echo = FALSE)
 library(knitr)
 library(here)
-library(deforestation)
+##library(deforestation)
 ```
 
 ### Introduction
@@ -28,13 +28,80 @@ library(deforestation)
 -- how carbon stocks are affected from deforestation
 -- how aboveground woody biomass (AGB) are affected from deforestation.
 
+```{r,message = FALSE,echo=FALSE, out.width="60%"}
+library(here)
+knitr::include_graphics(here('external/figures/study_area_projected.png'))
+
+```
+
+
+
 ---
 ### Data and Method 
 
----
+#### Data
+#### Method
 
+---
 ### Results
-```{r, out.width = "70%", echo=FALSE, fig.align='center'}
-knitr::include_graphics(here('external/figures/agb2000.png'))
+#### Forest area change between 1990 and 2000
+
+```{r,message = FALSE,echo=FALSE, out.width="50%"}
+knitr::include_graphics(here('external/figures/forest_cover_1990.png'))
+knitr::include_graphics(here('external/figures/forest_loss.png'))
+knitr::include_graphics(here('external/figures/forest_non-disturbance_area.png'))
+knitr::include_graphics(here('external/figures/forest_harvest_percentage.png'))
 ```
 
+---
+### Results
+#### Forest area change between 1990 and 2000
+Tables
+```{r,message = FALSE,echo=FALSE, out.width="50%"}
+
+```
+
+---
+### Results
+#### Forest area change between 1990 and 2000
+Bar Graphs
+```{r,message = FALSE,echo=FALSE, out.width="50%"}
+
+```
+
+---
+### Results
+#### Comparing forest carbon stock change between 1990 and 2000
+maps
+```{r,message = FALSE,echo=FALSE, out.width="50%"}
+
+```
+
+---
+### Results
+#### Comparing forest carbon stock change between 1990 and 2000
+bar graphs
+```{r,message = FALSE,echo=FALSE, out.width="50%"}
+
+```
+
+---
+### Results
+#### Comparing forest biomass change between 1990 and 2000
+maps
+```{r,message = FALSE,echo=FALSE, out.width="50%"}
+
+```
+
+---
+### Results
+#### Comparing forest biomass change between 1990 and 2000
+bar graphs 
+```{r,message = FALSE,echo=FALSE, out.width="50%"}
+
+```
+
+---
+### Discussion 
+
+---
