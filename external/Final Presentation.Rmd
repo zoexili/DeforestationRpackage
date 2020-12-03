@@ -36,7 +36,7 @@ knitr::include_graphics('figures/study_area.png')
 ##### National Aboveground Biomass and Carbon Baseline Dataset (NBCD, Version 2)
 
 #### Method
-##### Quantifying forest harvest: 
+##### Quantifying forest harvest: Identify the pixels that belong to forest cover class in 1990 and then changed to non_forest cover class in 2000.
 
 ##### Comparing forest carbon stock change: 
 
