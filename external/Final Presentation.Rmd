@@ -24,7 +24,7 @@ library(knitr)
 - Therefore, in this study, we chose six counties in Southern Virginia to understand the connection among deforestation, carbon, and biomass because forest harvesting events are particularly common in forestland of Virginia. 
 
 ```{r,message = FALSE,echo=FALSE, out.width="60%"}
-knitr::include_graphics('figures/study_area_projected.png')
+knitr::include_graphics('figures/study_area.png')
 ```
 
 ---
@@ -49,7 +49,10 @@ knitr::include_graphics('figures/study_area_projected.png')
 #### Forest area change between 1990 and 2000
 
 ```{r,message = FALSE,echo=FALSE, out.width="50%"}
-
+knitr::include_graphics('figures/forest_cover.png')
+knitr::include_graphics('figures/forest_harvest_map.png')
+knitr::include_graphics('figures/non_disturbance_area.png')
+knitr::include_graphics('figures/percentage_harvest_map.png')
 ```
 
 ---
@@ -57,7 +60,9 @@ knitr::include_graphics('figures/study_area_projected.png')
 #### Forest area change between 1990 and 2000
 Tables
 ```{r,message = FALSE,echo=FALSE, out.width="50%"}
-
+knitr::include_graphics('figures/harvest_table.png')
+knitr::include_graphics('figures/forest_cover_area_map.png')
+knitr::include_graphics('figures/per_table.png')
 ```
 
 ---
@@ -65,7 +70,9 @@ Tables
 #### Forest area change between 1990 and 2000
 Bar Graphs
 ```{r,message = FALSE,echo=FALSE, out.width="50%"}
-
+knitr::include_graphics('figures/bar_graph_total_forest_harvest_area.png')
+knitr::include_graphics('figures/bar_graph_total_forest_area.png')
+knitr::include_graphics('figures/bar_graph_forest_harvest_percentage.png')
 ```
 
 ---
