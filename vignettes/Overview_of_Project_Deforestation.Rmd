@@ -47,10 +47,10 @@ Biomass data were extracted from the National Aboveground Biomass and Carbon Bas
 Figure 1 shows our study region, six counties from Virginia. As we can see from figure 2, the forest extent map of 1990, which represents the forest cover area in 1990 across the study area. The forest harvest map (figure 3) shows the forest degeneration from 1990 to 2000. While, refers to figure 4, most areas of the study region weren’t disturbed during the 10 years. As for the forest harvest percentage map (figure 5), most areas are covered by green, which is in line with the result of the former two maps. Table 1 shows the total forest harvest area in each county. Brunswick county had the biggest forest harvest area (160948 acres) followed by Sussex county (134145 acres), while there were only 68166 acres forest disappeared in Greensville county during the given years. The total forest area in 1990 of Brunswick was the biggest among the six counties (1137933 acres), while the Greensville county, with 545649 acres, had the smallest forest area in 1990. (Refer to table 2). Table 3 shows the forest harvest percentage, Sussex county, with 0.147% percent of forest degeneration, suffered the most severe forest loss during the given year followed by 0.141% percent in Brunswick county and there was only 0.091% forest loss in Mecklenburg county. The three bar graphs (figure6-8) also show the same information as table but in a more visually direct way. 
 
 #### 3.1.1 Data pre-processing
-```{r setup, }
-devtools::document()
-devtools::install()
-library(deforestation)
+```{r, eval = FALSE}
+##devtools::document()
+##devtools::install()
+##library(deforestation)
 ```
 
 ```{r, set up, message = FALSE}
@@ -62,6 +62,14 @@ library(raster)
 library(ggplot2)
 library(here)
 library(gridExtra)
+library(knitr)
+library(deforestation)
+library(tmap)
+library(rasterVis)
+library(mapview)
+library(here)
+```
+
 ```
 
 ```{r, eval = FALSE}
@@ -401,18 +409,7 @@ Figure 10-12 shows aboveground woody biomass (AGB) in 1990 and 2000 collected fr
 In Figure 13, the biomass of total forest land is shown to be decreased from 1990 to 2000 because of frequent forest harvesting events in the study region. Since the NBCD dataset provides a much larger estimate of biomass which makes comparison impossible, we decide to ignore it. Figure 14 shows that Brunswick is the county that lost the highest amount of biomass from harvest events, followed by Sussex, Lunenburg, Mecklenburg, Dinwiddie, and Greensville. Figure 15 shows that Mecklenburg maintains the highest undisturbed biomass, followed by Brunswick, Dinwiddie, Lunenberg, Sussex, and Greensville. 
 
 #### 3.3.1 Data pre-processing
-```{r, set up, message = FALSE}
-library(geospaar)
-library(rgdal)
-library(dplyr)
-library(ggplot2)
-library(knitr)
-library(deforestation)
-library(tmap)
-library(rasterVis)
-library(mapview)
-library(here)
-```
+
 
 ```{r, eval = FALSE}
 # install your own package 'deforestation', run these two lines every time after changing anything in your package. 
