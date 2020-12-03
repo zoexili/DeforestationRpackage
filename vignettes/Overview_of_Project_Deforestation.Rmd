@@ -399,11 +399,199 @@ Figure 9 shows a visual representation of the change of net ecosystem productivi
 
 Further analyses on harvested areas and undisturbed areas show a similar trend of results with Brunswick county having the most amount of NEP and Greensville having the least.
 
+## Read in data  
+```{r, eval=FALSE}
+# NEP 1990
+path2 <- file.path("/Users/novak/Documents/Clark University/Senior Fall/Geospatial Analysis with R/Project Final/deforestation/Files/nep_1990.tif")
+nep_1990 <- raster(path2)
+
+# NEP 2000
+path3 <- file.path("/Users/novak/Documents/Clark University/Senior Fall/Geospatial Analysis with R/Project Final/deforestation/Files/nep_2000.tif")
+nep_2000 <- raster(path3)
+
+# Forest nondisturbance
+path4 <- file.path("/Users/novak/Documents/Clark University/Senior Fall/Geospatial Analysis with R/Project Final/data/forest_nondisturbances.tif")
+forest_nondist <- raster(path4)
+
+path5 <- system.file("extdata/forest_loss.tif", package = "deforestation")
+forest_loss <- raster(path5)
+```
+
+## Study area reprojection
+```{r, eval=FALSE}
+# Study area
+path <- system.file("extdata/VA_STUDYAREA.shp", package = "deforestation")
+studyarea <- st_read(dsn = path)
+studyarea_project <- st_transform(x = studyarea, crs = st_crs(nep_1990))
+# save new study area file
+st_write(obj = studyarea_project, dsn = file.path("inst/extdata/", "studyarea_project.shp"))
+```
+
+## nep1990
+```{r, eval=FALSE}
+nep_1990_crop <- crop(x = nep_1990, y = studyarea_project)
+nep_1990_real <- mask(x = nep_1990_crop, mask = studyarea_project)
+writeRaster(nep_1990_real, filename = file.path("external/figures/", "nep_1990_final.tif"), overwrite=TRUE)
+nep_1990_final <- raster(file.path("external/figures/nep_1990_final.tif"))
+png("external/figures/nep_1990_final.png")
+par(mar = c(0,0,0,0))
+plot_noaxes(nep_1990_final, main = "Net Ecosystem Productivity 1990")
+dev.off()
+```
+```{r, fig.align="center"}
+# Figure 9: Total NEP across Study Area in 1990
+knitr::include_graphics(here("external/figures/nep_1990_final.png"))
+```
+
+
+## nep2000
+```{r,eval=FALSE}
+nep_2000_crop <- crop(x = nep_2000, y = studyarea_project)
+nep_2000_real <- mask(x = nep_2000_crop, mask = studyarea_project)
+writeRaster(nep_2000_real, filename = file.path("external/figures/", "nep_2000_final.tif"), overwrite=TRUE)
+nep_2000_final <- raster(file.path("external/figures/nep_2000_final.tif"))
+png("external/figures/nep_2000_final.png")
+par(mar = c(0,0,0,0))
+plot_noaxes(nep_2000_final, main = "Net Ecosystem Productivity 2000")
+dev.off()
+```
+```{r, fig.align="center"}
+# Figure 10: Total NEP across Study Area in 2000
+knitr::include_graphics(here("external/figures/nep_2000_final.png"))
+```
+
+## Rasterize study area
+```{r, eval=FALSE}
+empty_raster <- raster(x = extent(studyarea_project), crs = crs(studyarea_project), res = 30)
+values(empty_raster) <- 1:ncell(empty_raster)
+studyarea_proj_ras <- studyarea_project %>% mutate(ID = 1:nrow(.))
+studyarea_raster <- studyarea_proj_ras %>% rasterize(x = ., y = empty_raster, field = "ID") %>% print()
+studyarea_raster <- raster(file.path("external/figures/studyarea_raster.tif"))
+png("external/figures/studyarea_raster.png")
+par(mar = c(0,0,0,0))
+plot_noaxes(studyarea_raster, main = "Study Area")
+dev.off()
+```
+```{r, fig.align="center"}
+# Figure 11: Study Area
+knitr::include_graphics(here("external/figures/studyarea_raster.png"))
+```
+
+## NEP Total comparison between 1990 and 2000
+```{r, eval=FALSE}
+# Total NEP 1990 by counties
+studyarea_raster_resample1 <- resample(x = studyarea_raster, y = nep_1990_final, method = "ngb")
+nep_1990_distr <- zonal(x = nep_1990_final, z = studyarea_raster_resample1, fun = "sum")
+nep_1990_distr
+nep_1990_distr_df <- as.data.frame(nep_1990_distr)
+rownames(nep_1990_distr_df) <- studyarea_project$NAME
+nep_1990_distr_df <- nep_1990_distr_df %>% 
+  mutate(Name = studyarea_project$NAME)
+colnames(nep_1990_distr_df ) <- c("Zone#", "NEP (g C m-2 year-1)", "County Name")
+
+
+# Total NEP 2000 by counties
+studyarea_raster_resample2 <- resample(x = studyarea_raster, y = nep_2000_final, method = "ngb")
+nep_2000_distr <- zonal(x = nep_2000_final, z = studyarea_raster_resample2, fun = "sum")
+nep_2000_distr
+nep_2000_distr_df <- as.data.frame(nep_2000_distr)
+rownames(nep_2000_distr_df) <- studyarea_project$NAME
+nep_2000_distr_df <- nep_2000_distr_df %>% 
+  mutate(Name = studyarea_project$NAME)
+colnames(nep_2000_distr_df ) <- c("Zone#", "NEP (g C m-2 year-1)", "County Name")
+
+
+nep_1990_distr_df <- nep_1990_distr_df %>% mutate(Year = c(1990, 1990, 1990, 1990, 1990, 1990))
+nep_2000_distr_df <- nep_2000_distr_df %>% mutate(Year = c(2000, 2000, 2000, 2000, 2000, 2000))
+two_nep <- rbind(nep_1990_distr_df, nep_2000_distr_df)
+png("external/figures/two_nep.png")
+two_nep %>%
+  ggplot(aes(x = `County Name`,  y = `NEP (g C m-2 year-1)`, fill = as.factor(Year))) + 
+  geom_bar(stat = "identity", position = position_dodge2()) +
+  ggtitle("Total NEP comparison by counties") +
+  xlab("County names") + 
+  scale_fill_manual(values = c("deepskyblue4", "tomato3"))
+dev.off()
+nep_distr_diff <- nep_2000_distr_df
+nep_distr_diff[2] <- nep_1990_distr_df[2] - nep_2000_distr_df[2]
+png("external/figures/nep_distr_diff.png")
+nep_distr_diff %>%
+  ggplot(aes(x = `County Name`,  y = `NEP (g C m-2 year-1)`)) + 
+  geom_bar(stat = "identity", fill = "deepskyblue4") +
+  ggtitle("NEP Difference between 1990 and 2000") +
+  xlab("County names")
+dev.off()
+```
+```{r,fig.align="center"}
+# Figure 12: Bar Graph: Comparison NEP in Each County between 1990 and 2000
+knitr::include_graphics(here("external/figures/two_nep.png"))
+# Figure 13: Bar Graph: NEP Difference in Each County between 1990 and 2000 
+knitr::include_graphics(here("external/figures/nep_distr_diff.png"))
+```
+
+
+## NEP of harvested forest area over six counties 
+```{r, eval=FALSE}
+forest_loss_proj <- raster(vals = values(forest_loss), ext = extent(nep_1990_real), crs = crs(nep_1990_real),  nrows=dim(forest_loss)[1], ncols=dim(forest_loss)[2])
+forest_loss_proj[forest_loss_proj == 0] <- NA
+
+forest_harv_1990 <- mask(x = nep_1990_real, mask = forest_loss_proj)
+studyarea_raster_resample3 <- resample(x = studyarea_raster, y = forest_harv_1990, method = "ngb")
+nep_harv_1990 <- zonal(x = forest_harv_1990, z = studyarea_raster_resample3, fun = "sum")
+nep_harv_1990
+nep_harv_1990_df <- as.data.frame(nep_harv_1990)
+rownames(nep_harv_1990_df) <- studyarea_project$NAME
+nep_harv_1990_df <- nep_harv_1990_df %>% 
+  mutate(Name = studyarea_project$NAME)
+colnames(nep_harv_1990_df ) <- c("Zone#", "NEP (g C m-2 year-1)", "County Name")
+
+png("external/figures/nep_harv_1990_df.png")
+nep_harv_1990_df %>%
+  ggplot(aes(x = `County Name`,  y = `NEP (g C m-2 year-1)`)) + 
+  geom_bar(stat = "identity", fill = "deepskyblue4") +
+  ggtitle("Total NEP in Harvested Forest Area in 1990") +
+  xlab("County names")
+dev.off()
+```
+```{r,fig.align="center"}
+# Figure 14: Bar Graph: Loss of NEP from 1990 to 2000 in Harvested Area
+knitr::include_graphics(here("external/figures/nep_harv_1990_df.png"))
+```
+
+## NEP of nondisturbed area over six counties 
+```{r, eval=FALSE}
+# Reproject forest nondisturbance area 
+forest_nondist_proj <- raster(vals = values(forest_nondist), ext = extent(nep_1990_real), crs = crs(nep_1990_real),  nrows=dim(forest_nondist)[1], ncols=dim(forest_nondist)[2])
+forest_nondist_proj[forest_nondist_proj == 0] <- NA
+
+forest_nondist_1990 <- mask(x = nep_1990_real, mask = forest_nondist_proj)
+studyarea_raster_resample5 <- resample(x = studyarea_raster, y = forest_nondist_1990, method = "ngb")
+nep_undist_1990 <- zonal(x = forest_nondist_1990, z = studyarea_raster_resample5, fun = "sum")
+nep_undist_1990
+nep_undist_1990_df <- as.data.frame(nep_undist_1990)
+rownames(nep_undist_1990_df) <- studyarea_project$NAME
+nep_undist_1990_df <- nep_undist_1990_df %>% 
+  mutate(Name = studyarea_project$NAME)
+colnames(nep_undist_1990_df ) <- c("Zone#", "NEP (g C m-2 year-1)", "County Name")
+
+png("external/figures/nep_undist_1990_df.png")
+nep_undist_1990_df %>%
+  ggplot(aes(x = `County Name`,  y = `NEP (g C m-2 year-1)`)) + 
+  geom_bar(stat = "identity", fill = "deepskyblue4") +
+  ggtitle("Total NEP in Undisturbed Forest Area in 1990") +
+  xlab("County names")
+dev.off()
+```
+```{r,fig.align="center"}
+# Figure 15: Bar Graph: Preserved  NEP from 1990 to 2000 in Undisturbed Area
+knitr::include_graphics(here("external/figures/nep_undist_1990_df.png"))
+```
+
 ### 3.3 Forest biomass change between 1990 and 2000 (Li) 
 
-Figure 10-12 shows aboveground woody biomass (AGB) in 1990 and 2000 collected from two different datasets. The SE forest carbon stock dataset shows that the total AGB in 1990 and 2000 ranges from about 1 to 11 kg C per square meter. Differently, the NBCD dataset represents a much larger range of AGB estimates for our study area, about 0 to 32 kg C per square meter. One potential reason causing this distinct difference is due to different biomass measuring approaches.   
+Figure 16-18 shows aboveground woody biomass (AGB) in 1990 and 2000 collected from two different datasets. The SE forest carbon stock dataset shows that the total AGB in 1990 and 2000 ranges from about 1 to 11 kg C per square meter. Differently, the NBCD dataset represents a much larger range of AGB estimates for our study area, about 0 to 32 kg C per square meter. One potential reason causing this distinct difference is due to different biomass measuring approaches.   
 
-In Figure 13, the biomass of total forest land is shown to be decreased from 1990 to 2000 because of frequent forest harvesting events in the study region. Since the NBCD dataset provides a much larger estimate of biomass which makes comparison impossible, we decide to ignore it. Figure 14 shows that Brunswick is the county that lost the highest amount of biomass from harvest events, followed by Sussex, Lunenburg, Mecklenburg, Dinwiddie, and Greensville. Figure 15 shows that Mecklenburg maintains the highest undisturbed biomass, followed by Brunswick, Dinwiddie, Lunenberg, Sussex, and Greensville. 
+In Figure 19, the biomass of total forest land is shown to be decreased from 1990 to 2000 because of frequent forest harvesting events in the study region. Since the NBCD dataset provides a much larger estimate of biomass which makes comparison impossible, we decide to ignore it. Figure 20 shows that Brunswick is the county that lost the highest amount of biomass from harvest events, followed by Sussex, Lunenburg, Mecklenburg, Dinwiddie, and Greensville. Figure 21 shows that Mecklenburg maintains the highest undisturbed biomass, followed by Brunswick, Dinwiddie, Lunenberg, Sussex, and Greensville. 
 
 #### 3.3.1 Data pre-processing
 
@@ -697,19 +885,19 @@ dev.off()
 ```
 
 ```{r, out.width = "80%", fig.pos="h"}
-# Figure 10: Aboveground woody biomass 1990 map. (SE forest carbon stock dataset). 
+# Figure 16: Aboveground woody biomass 1990 map. (SE forest carbon stock dataset). 
 knitr::include_graphics(here('external/figures/agb1990.png'))
 knitr::include_graphics(here('external/figures/agb1990_rastervis.png'))
-# Figure 11: Aboveground woody biomass 2000 map. (SE forest carbon stock dataset). 
+# Figure 17: Aboveground woody biomass 2000 map. (SE forest carbon stock dataset). 
 knitr::include_graphics(here('external/figures/agb2000.png'))
 knitr::include_graphics(here('external/figures/agb2000_rastervis.png'))
-# Figure 12: Aboveground woody biomass 2000 map. (NBCD dataset).
+# Figure 18: Aboveground woody biomass 2000 map. (NBCD dataset).
 knitr::include_graphics(here('external/figures/biomass_FIA_ALD2000.png'))
-# Figure 13: Bar graph of AGB for total forest land. The middle bar is from the SE forest carbon stock dataset, while the right bar is from the NBCD dataset. 
+# Figure 19: Bar graph of AGB for total forest land. The middle bar is from the SE forest carbon stock dataset, while the right bar is from the NBCD dataset. 
 knitr::include_graphics(here('external/figures/bar_agb.png'))
-# Figure 14: Bar graph of AGB lost between 1990 and 2000. 
+# Figure 20: Bar graph of AGB lost between 1990 and 2000. 
 knitr::include_graphics(here('external/figures/bar_agb_harvested.png'))
-# Figure 15: Bar graph of AGB undisturbed between 1990 and 2000. 
+# Figure 21: Bar graph of AGB undisturbed between 1990 and 2000. 
 knitr::include_graphics(here('external/figures/bar_agb_undisturbed.png'))
 
 ```
