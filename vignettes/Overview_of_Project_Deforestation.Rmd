@@ -63,12 +63,9 @@ library(ggplot2)
 library(here)
 library(gridExtra)
 library(knitr)
-library(deforestation)
 library(tmap)
 library(rasterVis)
 library(mapview)
-library(here)
-```
 
 ```
 
@@ -409,7 +406,6 @@ Figure 10-12 shows aboveground woody biomass (AGB) in 1990 and 2000 collected fr
 In Figure 13, the biomass of total forest land is shown to be decreased from 1990 to 2000 because of frequent forest harvesting events in the study region. Since the NBCD dataset provides a much larger estimate of biomass which makes comparison impossible, we decide to ignore it. Figure 14 shows that Brunswick is the county that lost the highest amount of biomass from harvest events, followed by Sussex, Lunenburg, Mecklenburg, Dinwiddie, and Greensville. Figure 15 shows that Mecklenburg maintains the highest undisturbed biomass, followed by Brunswick, Dinwiddie, Lunenberg, Sussex, and Greensville. 
 
 #### 3.3.1 Data pre-processing
-
 
 ```{r, eval = FALSE}
 # install your own package 'deforestation', run these two lines every time after changing anything in your package. 
