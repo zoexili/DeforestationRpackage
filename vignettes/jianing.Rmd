@@ -1,0 +1,356 @@
+---
+title: "jianing_forest_dynamics"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{jianing}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+```{r setup, }
+devtools::document()
+devtools::install()
+library(deforestation)
+```
+
+
+```{r, set up, message = FALSE}
+library(geospaar)
+library(dplyr)
+library(rgdal)
+library(tiff)
+library(raster)
+library(ggplot2)
+library(here)
+library(gridExtra)
+```
+
+```{r, eval = FALSE}
+### Data pre-processing 
+## Read study area shape file:
+study_area <- system.file("extdata/VA_STUDYAREA.shp", package = "deforestation")
+study_area <- st_read(study_area)
+study_area
+
+```
+
+```{r, eval = FALSE}
+##import North American Forest Dynamics map of 1990 and 2000:
+path1 <-"/Users/lijianing/Desktop/NAFD-NEX_Forest_Disturbance_1290/data/VCT_Annual_30m_1990.tif"
+path2 <-"/Users/lijianing/Desktop/NAFD-NEX_Forest_Disturbance_1290/data/VCT_Annual_30m_2000.tif"
+forest_1990 <- raster(path1)
+forest_2000 <- raster(path2)
+forest_1990
+forest_2000
+
+### Reproject study area shapefile:
+study_area_projected <- st_transform(x = study_area, crs = st_crs(forest_1990))
+study_area_projected
+
+```
+
+```{r, eval = FALSE}
+##write raster into a new tif and save it in extdata/
+st_write(obj = study_area_projected, dsn = file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata", "study_area_projected.shp"), delete_layer = TRUE)
+```
+
+```{r, eval = FALSE}
+### plot study area map:
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/study_area_projected.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+par(mar = c(0, 0, 1, 0))
+cols <- c("lavender", "lavenderblush1", "lightblue", "honeydew1", "lightpink1", "lightgoldenrodyellow") 
+plot(st_geometry(study_area_projected), col = cols, main = "Study Area")
+legend(x = "bottomright", pch = 15, col = cols, bty = "n", legend = study_area_projected$NAME)
+dev.off()
+```
+
+```{r, eval = FALSE}
+## crop raster
+forest_1990_cropped <- crop(x = forest_1990, y = study_area_projected)
+forest_1990_cropped
+forest_2000_cropped <- crop(x = forest_2000, y = study_area_projected)
+forest_2000_cropped
+```
+
+```{r, eval = FALSE}
+## mask raster
+forest_1990_masked <- raster::mask (x = forest_1990_cropped, mask =
+study_area_projected)
+forest_1990_masked
+forest_2000_masked <- raster::mask (x = forest_2000_cropped, mask =
+study_area_projected)
+forest_2000_masked
+```
+
+```{r, eval = FALSE}
+### Plot masked map:
+plot(forest_1990_masked)
+plot(forest_2000_masked)
+```
+
+
+```{r, eval = FALSE}
+##write raster into a new tif and save it in extdata/ 
+writeRaster(forest_1990_masked, 
+            filename = file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata/","vct_forest_1990.tif"))
+
+writeRaster(forest_2000_masked, 
+            filename = file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata/","vct_forest_2000.tif"))
+
+```
+
+```{r, eval = FALSE}
+## extract the non_forest_cover area in 1990(class 2 represent non forest cover)
+non_forest_cover_1990 <- forest_1990_masked == 2
+non_forest_cover_1990
+## Extract forest cover area in 1990 (forest extent map)
+forest_cover_1990 <- forest_1990_masked == 3
+forest_cover_1990
+```
+
+```{r, eval = FALSE}
+## extract the non_forest_cover area in 2000(class 2 represent non forest cover)
+non_forest_cover_2000 <- forest_2000_masked == 2
+non_forest_cover_2000
+## Extract forest cover area in 2000:
+forest_cover_2000 <- forest_2000_masked == 3
+forest_cover_2000
+```
+
+
+```{r, eval = FALSE}
+### Plot forest cover area in 1990 map:
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/forest_cover_1990.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+
+plot_noaxes(forest_cover_1990, legend = FALSE, main = "Forest cover area in 1990",  
+            mar = c(0, 0, 1, 0))
+legend(x = "bottomright", legend = "Forest cover area", 
+       pch = 15, pt.cex = 3, col = "forestgreen", bty = "n")
+plot(st_geometry(study_area_projected),  add=TRUE)
+dev.off()
+```
+
+```{r, eval = FALSE}
+##write raster into a new tif and save it in extdata/:
+writeRaster(forest_cover_1990, 
+            filename = file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata","forestcover_1990.tif"))
+forestcover_1990<- raster(
+  file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata", "forestcover_1990.tif")
+)
+```
+
+```{r, eval = FALSE}
+### Create an forest harvest map:
+forest_loss <- forest_1990_masked == 3 & forest_2000_masked == 2
+forest_loss
+```
+
+```{r, eval = FALSE}
+### Plot forest harvest map:
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/forest_loss.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+cols <- c("white", "lightcoral") 
+plot_noaxes(forest_loss, legend = FALSE, main = "Forest Harvest Map", col = cols, 
+            mar = c(0, 0, 1, 0))
+legend(x = "bottomright", legend = "Forest loss ", 
+       pch = 15, pt.cex = 3, col =rev(cols), bty = "n")
+plot(st_geometry(study_area_projected),  add=TRUE)
+dev.off()
+```
+```{r, eval = FALSE}
+### Create an forest non-disturbance map:
+forest_nondist <- forest_1990_masked == 3 & forest_2000_masked == 3
+forest_nondist
+```
+
+```{r, eval = FALSE}
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/forest_non-disturbance_area.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+### Plot forest non-disturbance map:
+cols <- c("white", "green4") 
+plot_noaxes(forest_nondist, legend = FALSE, main = "Forest Non-disturbance Map", col = cols, 
+            mar = c(0, 0, 1, 0))
+legend(x = "bottomright", legend = "Forest non-disturbance area ", 
+       pch = 15, pt.cex = 3, col =rev(cols), bty = "n")
+plot(st_geometry(study_area_projected),  add=TRUE)
+dev.off()
+```
+
+
+```{r, eval = FALSE}
+##write raster into a new tif and save it in extdata/:
+writeRaster(forest_nondist, 
+            filename = file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata", "forest_nondisturbances.tif"))
+forest_nondisturbance<- raster(
+  file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata", "forest_nondisturbances.tif")
+  )
+
+writeRaster(forest_loss, 
+            filename = file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata","forest_loss.tif"))
+forest_loss<- raster(
+  file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata", "forest_loss.tif")
+)
+```
+
+```{r, eval = FALSE}
+### Forest harvest percentage map:
+perforest<- (forest_loss/forest_cover_1990) *0.01
+perforest
+```
+
+
+```{r, eval = FALSE}
+### Plot forest harvest percentage map: 
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/forest_harvest_percentage.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+cols <- c("darkolivegreen2", "navajowhite1", "lightcoral")
+plot_noaxes(perforest, main = "Forest harvest percentage map", col = cols, 
+            mar = c(0, 0, 1, 0))
+plot(st_geometry(study_area_projected),  add=TRUE)
+dev.off()
+```
+```{r, eval = FALSE}
+##write raster into a new tif and save it in extdata/
+writeRaster(perforest, 
+            filename = file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata","forest_harvest_percentage_map.tif"))
+forest_harvest_percentage_map<- raster(
+  file.path("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/inst/extdata", "forest_harvest_percentage_map.tif")
+)
+```
+
+
+```{r, eval = FALSE}
+### Rasterize study area shapefile:
+studyareas <- raster(x = extent(study_area_projected), crs = crs(study_area_projected ), res = 30)
+values(studyareas) <- 1:ncell(studyareas)
+studyareas1 <- study_area_projected %>% mutate(ID = 1:nrow(.))
+studyarea_sr <- studyareas1 %>% rasterize(x = ., y = studyareas, field = "ID") 
+plot(studyarea_sr)
+```
+
+```{r, eval = FALSE}
+### change to same extent:
+studyarea_sr_rs <- resample(x = studyarea_sr , y = forest_loss, method = "ngb")   
+```
+
+```{r, eval = FALSE}
+### Table of forest loss area in each county:
+forestlosstot <- zonal(x = forest_loss, z = studyarea_sr_rs, fun = "sum")
+forestlosstot
+forestlosstot_df <- as.data.frame(forestlosstot)
+colnames(forestlosstot_df) <- c("Zone", "Totol forest harvest area in counties")
+rownames(forestlosstot_df) <- study_area_projected$NAME
+forestlosstot_df
+```
+
+
+```{r, eval = FALSE}
+### Save into png:
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/forest_harvest_area_table.png")
+t<-tableGrob(forestlosstot_df)
+grid.arrange(t)
+dev.off()
+```
+
+```{r, eval = FALSE}
+### Table of total forest area in1990 in each county:
+foresttot <- zonal(x = forest_cover_1990, z = studyarea_sr_rs, fun = "sum")
+foresttot
+foresttot_df <- as.data.frame(foresttot)
+colnames(foresttot_df) <- c("Zone", "Totol forest area in counties in 1990")
+rownames(foresttot_df) <- study_area_projected$NAME
+foresttot_df
+```
+
+```{r, eval = FALSE}
+### Save into png:
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/forest_area_1990_table.png")
+t1<-tableGrob(foresttot_df)
+grid.arrange(t1)
+dev.off()
+```
+
+```{r, eval = FALSE}
+### covert into numeric: 
+forestlosstot_df$`Totol forest harvest area in counties` <- as.numeric(forestlosstot_df$`Totol forest harvest area in counties`) 
+forestlosstot_df$`Totol forest harvest area in counties`
+forestlosstot_df
+
+foresttot_df$`Totol forest area in counties in 1990` <- as.numeric(foresttot_df$`Totol forest area in counties in 1990`)
+foresttot_df$`Totol forest area in counties in 1990`
+foresttot_df
+```
+
+```{r, eval = FALSE}
+### Table of forest loss percentage of each county: 
+forestlossper_df <- foresttot_df %>% mutate(percentage = (forestlosstot_df$`Totol forest harvest area in counties` / foresttot_df$`Totol forest area in counties in 1990`) *0.01)
+forestlossper_df
+colnames(forestlossper_df) <- c("Zone", "Totol forest area ", "Forest harvest percentage")
+rownames(forestlossper_df) <- study_area_projected$NAME
+forestlossper_df
+
+```
+
+```{r, eval = FALSE}
+### Save into png:
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/forest_harvest_area_percentage_table.png")
+t2<-tableGrob(forestlossper_df)
+grid.arrange(t2)
+dev.off()
+```
+
+```{r, eval = FALSE}
+### Bar graph for Total acres of forest harvest in 6 counties: 
+forestlosstot_df$Name <- study_area_projected$NAME
+
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/bar_graph_total_forest_harvest_area.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+ggplot(data = forestlosstot_df, aes(x = Name, y = `Totol forest harvest area in counties`, fill = Name)) +
+  geom_bar(colour = "black", stat="identity")+
+  theme_classic()
+dev.off()
+```
+
+```{r, eval = FALSE}
+### Bar graph for Total acres of forest extent in 6 counties 1990: 
+foresttot_df$Name <- study_area_projected$NAME
+
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/bar_graph_total_forest_area.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+ggplot(data = foresttot_df, aes(x = Name, y = `Totol forest area in counties in 1990`, fill = Name)) +
+  geom_bar(colour = "black", stat="identity")+
+  theme_classic()
+dev.off()
+```
+
+```{r, eval = FALSE}
+### Bar graph for  Forest harvest percentage in 6 counties: 
+forestlossper_df$Name <- study_area_projected$NAME
+
+png("/Users/lijianing/Desktop/geospatial R/final_project/deforestation/external/figures/bar_graph_forest_harvest_percentage.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
+ggplot(data = forestlossper_df, aes(x = Name, y = `Forest harvest percentage`, fill = Name)) +
+  geom_bar(colour = "black", stat="identity")+
+  theme_classic()
+dev.off()
+```
+
+```{r, out.width = "80%", fig.pos="h"}
+knitr::include_graphics(here('external/figures/study_area_projected.png'))
+knitr::include_graphics(here('external/figures/forest_cover_1990.png'))
+knitr::include_graphics(here('external/figures/forest_loss.png'))
+knitr::include_graphics(here('external/figures/forest_non-disturbance_area.png'))
+knitr::include_graphics(here('external/figures/forest_harvest_percentage.png'))
+knitr::include_graphics(here('external/figures/forest_harvest_area_table.png'))
+knitr::include_graphics(here('external/figures/forest_area_1990_table.png'))
+knitr::include_graphics(here('external/figures/forest_harvest_area_percentage_table.png'))
+knitr::include_graphics(here('external/figures/bar_graph_total_forest_harvest_area.png'))
+knitr::include_graphics(here('external/figures/bar_graph_total_forest_area.png'))
+knitr::include_graphics(here('external/figures/bar_graph_forest_harvest_percentage.png'))
+```
+
+
+
+
+

@@ -23,7 +23,7 @@ output:
 - Maybe some visualization
 
 ---
-### Spot the bug
+### Data and Method 
 
 #### Reading in `geospaar` data
 ```{r, eval=FALSE}

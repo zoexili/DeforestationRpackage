@@ -1,6 +1,7 @@
 .Rproj.user
 .Rbuildignore
 .Rhistory
+.RData
 inst/doc
 .RData
 Virginia County Shapefile
