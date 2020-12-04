@@ -68,7 +68,7 @@ knitr::include_graphics('figures/per_table.png')
 ### Results
 #### Forest area change between 1990 and 2000
 
-```{r,message = FALSE,echo=FALSE, out.width="50%"}
+```{r,message = FALSE,echo=FALSE, out.width="45%"}
 knitr::include_graphics('figures/bar_harvest_area.png')
 knitr::include_graphics('figures/bar_forest_cover.png')
 knitr::include_graphics('figures/bar_harvest.png')
