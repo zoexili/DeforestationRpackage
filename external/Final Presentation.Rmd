@@ -23,8 +23,8 @@ library(knitr)
 - Deforestation can affect a wide range of ecological functions, including carbon stocks and biomass accumulations.
 - Therefore, in this study, we chose six counties in Southern Virginia to understand the connection among deforestation, carbon, and biomass because forest harvesting events are particularly common in forestland of Virginia. 
 
-```{r,message = FALSE,echo=FALSE, out.width="60%"}
-knitr::include_graphics('figures/study_area_projected.png')
+```{r,message = FALSE,echo=FALSE, out.width="50%"}
+knitr::include_graphics('figures/study_area.png')
 ```
 
 ---
@@ -35,8 +35,9 @@ knitr::include_graphics('figures/study_area_projected.png')
 ##### Forest Carbon Stocks and Fluxes After Disturbance, Southeastern USA, 1990-2010
 ##### National Aboveground Biomass and Carbon Baseline Dataset (NBCD, Version 2)
 
+
 #### Methods
-##### Quantifying forest harvest: 
+##### Quantifying forest harvest: Identify the pixels that belong to forest cover class in 1990 and then changed to non_forest cover class in 2000.
 
 ##### Comparing forest carbon stock change: 
 
@@ -48,22 +49,36 @@ knitr::include_graphics('figures/study_area_projected.png')
 ### Results
 #### Forest area change between 1990 and 2000
 
-```{r,message = FALSE,echo=FALSE, out.width="50%"}
-
+```{r,message = FALSE,echo=FALSE, out.width="45%"}
+knitr::include_graphics('figures/forest_cover.png')
+knitr::include_graphics('figures/forest_harvest_map.png')
+knitr::include_graphics('figures/non_disturbance_area.png')
+knitr::include_graphics('figures/percentage_harvest_map.png')
 ```
 
 ---
 ### Results
 #### Forest area change between 1990 and 2000
-Tables
 ```{r,message = FALSE,echo=FALSE, out.width="50%"}
-
+knitr::include_graphics('figures/harvest_table.png')
+knitr::include_graphics('figures/forest_cover_area_map.png')
+knitr::include_graphics('figures/per_table.png')
 ```
 
 ---
 ### Results
 #### Forest area change between 1990 and 2000
-Bar Graphs
+
+```{r,message = FALSE,echo=FALSE, out.width="50%"}
+knitr::include_graphics('figures/bar_graph_total_forest_harvest_area.png')
+knitr::include_graphics('figures/bar_graph_total_forest_area.png')
+knitr::include_graphics('figures/bar_graph_forest_harvest_percentage.png')
+```
+
+---
+### Results
+#### Comparing forest carbon stock change between 1990 and 2000
+
 ```{r,message = FALSE,echo=FALSE, out.width="50%"}
 
 ```
@@ -71,15 +86,7 @@ Bar Graphs
 ---
 ### Results
 #### Comparing forest carbon stock change between 1990 and 2000
-maps
-```{r,message = FALSE,echo=FALSE, out.width="50%"}
 
-```
-
----
-### Results
-#### Comparing forest carbon stock change between 1990 and 2000
-bar graphs
 ```{r,message = FALSE,echo=FALSE, out.width="50%"}
 
 ```
