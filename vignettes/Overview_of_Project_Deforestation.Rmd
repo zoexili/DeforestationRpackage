@@ -393,6 +393,7 @@ knitr::include_graphics(here('external/figures/bar_graph_total_forest_area.png')
 ### Figure 8: Bar graph of forest harvest percentage.
 knitr::include_graphics(here('external/figures/bar_graph_forest_harvest_percentage.png'))
 ```
+
 ### 3.2 Forest carbon stock change between 1990 and 2000  (Novak) 
 
 Figure 9 shows a visual representation of the change of net ecosystem productivity (NEP) between 1990 and 2000. Overall, we can see a trend of decreasing amount of NEP from 1990 to 2000. Brunswick County has the largest amount of NEP across all six counties in both 1990 and 2000. The biggest decrease of NEP is also observed in Brunswick County with a decrease of 46,541,717g C m-2year-1 from 1990 to 2000 followed by a decrease of 32,846,791g C m-2year-1 in Lunenberg. 

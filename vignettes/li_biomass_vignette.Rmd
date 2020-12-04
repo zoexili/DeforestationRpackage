@@ -179,7 +179,7 @@ plot_noaxes(agb2000_kgC, main = "Aboveground Woody Biomass 2000", legend.args = 
 dev.off()
 
 # rastervis
-png("external/figures/agb2000_rastervis.png", bg = "black", height = 5, width = 5, res = 300, units = "in")
+png("external/figures/agb2000_rastervis.png", bg = "white", height = 5, width = 5, res = 300, units = "in")
 levelplot(agb2000_kgC)
 dev.off()
 
