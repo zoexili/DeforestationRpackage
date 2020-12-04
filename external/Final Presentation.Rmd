@@ -39,8 +39,7 @@ knitr::include_graphics('figures/study_area.png')
 #### Methods
 ##### Quantifying forest harvest: Identify the pixels that belong to forest cover class in 1990 and then changed to non_forest cover class in 2000.
 
-##### Comparing forest carbon stock change: 
-
+##### Comparing forest carbon stock change: Net ecosystem productivity values were extracted from the above dataset and compare across all six counties in study area between 1990 and 2000.
 ##### Comparing forest biomass change: Biomass data were extracted from the datasets above and then Biomass were compared between 1990 and 2000 for all forest land, the forest harvested land, and the undisturbed land. 
 
 ##### Packages used: geospaar, dplyr, rgdal, raster, ggplot2, here, gridExtra, knitr, tmap, rastervis, mapview. 
@@ -78,17 +77,18 @@ knitr::include_graphics('figures/bar_harvest.png')
 ---
 ### Results
 #### Comparing forest carbon stock change between 1990 and 2000
-
-```{r,message = FALSE,echo=FALSE, out.width="50%"}
-
+```{r, message = FALSE,echo=FALSE, out.width="50%"}
+knitr::include_graphics('figures/nep_1990_final.png')
+knitr::include_graphics('figures/nep_2000_final.png')
 ```
 
 ---
 ### Results
-#### Comparing forest carbon stock change between 1990 and 2000
-
-```{r,message = FALSE,echo=FALSE, out.width="50%"}
-
+```{r, message = FALSE,echo=FALSE, out.width="35%"}
+knitr::include_graphics('figures/two_nep.png')
+knitr::include_graphics('figures/nep_distr_diff.png')
+knitr::include_graphics('figures/nep_harv_1990_df.png')
+knitr::include_graphics('figures/nep_undist_1990_df.png')
 ```
 
 ---
