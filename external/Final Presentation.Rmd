@@ -23,7 +23,7 @@ library(knitr)
 - Deforestation can affect a wide range of ecological functions, including carbon stocks and biomass accumulations.
 - Therefore, in this study, we chose six counties in Southern Virginia to understand the connection among deforestation, carbon, and biomass because forest harvesting events are particularly common in forestland of Virginia. 
 
-```{r,message = FALSE,echo=FALSE, out.width="50%"}
+```{r,message = FALSE,echo=FALSE, out.width="50%"，fig.align='center'}
 knitr::include_graphics('figures/study_area.png')
 ```
 
