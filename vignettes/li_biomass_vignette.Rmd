@@ -106,9 +106,10 @@ biomass_FIA_ALD2000 <- raster(
 biomass_FIA_ALD2000_kgC <- biomass_FIA_ALD2000/10 
 
 ## save png file
-#png("external/figures/biomass_FIA_ALD2000.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+png("external/figures/biomass_FIA_ALD2000.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+par(bg="white", mar = c(0, 0, 0, 0))
 plot_noaxes(biomass_FIA_ALD2000_kgC, main = "Aboveground Live Dry Biomass 2000", legend.args = list(text = expression("Kg C m"^-2)))
-#dev.off()
+dev.off()
 
 
 # Dataset: Forest Carbon Stocks and Fluxes After Disturbance, SE US
@@ -150,9 +151,10 @@ agb1990 <- raster(
 # unit converted from g to kg 
 agb1990_kgC <- agb1990 / 1000
 
-#png("external/figures/agb1990.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+png("external/figures/agb1990.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+par(bg="white")
 plot_noaxes(agb1990_kgC, main = "Aboveground Woody Biomass 1990", legend.args = list(text = expression("kg C m"^-2)))
-#dev.off()
+dev.off()
 
 # rastervis
 png("external/figures/agb1990_rastervis.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
@@ -170,9 +172,10 @@ agb2000 <- raster(
   file.path("inst/extdata/", "agb2000.tif")
   )
 agb2000_kgC <- agb2000 / 1000
-#png("external/figures/agb2000.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+png("external/figures/agb2000.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
+par(bg="white")
 plot_noaxes(agb2000_kgC, main = "Aboveground Woody Biomass 2000", legend.args = list(text = expression("kg C m"^-2)))
-#dev.off()
+dev.off()
 
 # rastervis
 png("external/figures/agb2000_rastervis.png", bg = "transparent", height = 5, width = 5, res = 300, units = "in")
@@ -238,13 +241,14 @@ zonal_NBCD2000_df$Name <- studyarea_nad83$NAME
 
 # Join two dfs and create one bar graph
 df <- full_join(x = zonal_agb1990_df, y = zonal_agb2000_df) %>% full_join(., zonal_NBCD2000_df)
-df$year <- c("1990","1990" , "1990", "1990", "1990", "1990", "2000", "2000", "2000", "2000", "2000", "2000","2000", "2000", "2000", "2000", "2000", "2000")  # year column needs to be character, not numeric.
+df$year <- c("1990","1990" , "1990", "1990", "1990", "1990", "2000", "2000", "2000", "2000", "2000", "2000","2000 NBCD", "2000 NBCD", "2000 NBCD", "2000 NBCD", "2000 NBCD", "2000 NBCD")  # year column needs to be character, not numeric.
 
 png("external/figures/bar_agb.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
 ggplot(data = df, aes(x = Name, y = `AGB of total forest land (Kg C m-2)`, fill = year)) +
   geom_bar(colour = "black", stat="identity", position = position_dodge2())+
   scale_fill_brewer(palette="Paired")+
-  theme_classic()
+  ggtitle("Aboveground Woody Biomass of Total Forest Land")+
+  theme(plot.background = element_rect(fill = "lightgrey"))
 dev.off()
 ```
 
@@ -277,9 +281,10 @@ zonal_loss1990_df$Name <- studyarea_nad83$NAME
 # Bar graph - harvested agb between 1990 and 2000
 png("external/figures/bar_agb_harvested.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
 ggplot(data = zonal_loss1990_df, aes(x = Name, y = `AGB of harvested forest land (Kg C m-2)`, fill = Name)) +
-  geom_bar(colour = "black", stat="identity")+
+  geom_bar(colour = "black", stat="identity", show.legend = FALSE)+
   scale_fill_brewer(palette="Set2")+
-  theme_classic()
+  ggtitle("Aboveground Woody Biomass of Forest Harvested Land")+
+  theme(plot.background = element_rect(fill = "lightgrey"))
 dev.off()
 ```
 
@@ -312,9 +317,10 @@ zonal_undisturb1990_df$Name <- studyarea_nad83$NAME
 # Bar graph - Undisturbed agb between 1990 and 2000
 png("external/figures/bar_agb_undisturbed.png", bg = "transparent", height = 5, width = 8, res = 300, units = "in")
 ggplot(data = zonal_undisturb1990_df, aes(x = Name, y = `AGB of undisturbed forest land (Kg C m-2)`, fill = Name)) +
-  geom_bar(colour = "black", stat="identity")+
+  geom_bar(colour = "black", stat="identity", show.legend = FALSE)+
   scale_fill_brewer(palette="Set2")+
-  theme_classic()
+  ggtitle("Aboveground Woody Biomass of Forest Undisturbed Land")+
+  theme(plot.background = element_rect(fill = "lightgrey"))
 dev.off()
 ```
 
